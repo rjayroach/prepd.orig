@@ -1,0 +1,13 @@
+---
+# NOTE: app and app_vault values come from group_vars
+#       values that do not come from there are 'global' to all environments
+# TODO: Perhpas this and project.yml should be in host_vars with ln -s between environments
+# TODO: Test this with running a docker container using compose
+app_env:
+  SOME_MAX_VALUE: 7
+  DATABASE_HOST: '{{ app.DATABASE_HOST }}'
+  DATABASE_NAME: '{{ app.DATABASE_NAME }}'
+  DATABASE_USERNAME: '{{ app_vault.DATABASE_USERNAME }}'
+  DATABASE_PASSWORD: '{{ app_vault.DATABASE_PASSWORD }}'
+  RABBITMQ_HOST: '{{ app.RABBITMQ_HOST }}'
+  REDIS_HOST: '{{ app.REDIS_HOST }}'

@@ -1,0 +1,34 @@
+#!/usr/bin/env ansible-playbook
+# NOTE: This playbook installs all the application dependenices for development
+# on the 'dev' machine so it is a stand-alone product
+---
+- hosts: dev
+
+  pre_tasks:
+    - include_vars: '{{ item }}'
+      with_first_found:
+         - '../../developer.yml'
+         - '~/.ansible-developer.yml'
+
+  roles:
+    - common
+    - yadr
+    - developer
+    - developer-tools
+    - postgres
+    - redis
+
+
+- hosts: dev:&env_local
+
+  roles:
+    - terraform
+    # NOTE: Example of how to test a new role:
+    # invoke this playbook using: ./dev.yml --tags test
+    # - { role: terraform, tags: 'test' }
+  # TODO: If ec2.py is in the inventory then it will be called by node config as well
+  tasks:
+    - name: install boto
+      pip: 
+        name: boto
+        state: present

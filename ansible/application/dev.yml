@@ -1,0 +1,53 @@
+#!/usr/bin/env ansible-playbook
+---
+# This playbook installs all the application dependenices for development
+# This play installs Postgres onto the database group
+# NOTE: In staging and production PG will be provisioned by Terraform on AWS
+- hosts: database
+
+# NOTE: Uses vars from group_vars to create PG user
+  roles:
+    - postgres
+
+
+# NOTE: This play installs Redis onto the redis group ( Could also include a play for RabbitMQ)
+- hosts: cache
+
+  roles:
+    - redis
+
+
+# - nginx is perx specific; move the template for the project out of the role
+# and into a pre_task that is done by this playbook
+# This play installs the application's requirements for development
+# TODO: Add task to copy in tempalte and a handler to reload the service
+- hosts: web
+
+  roles:
+    - nginx
+
+
+# NOTE: Installs the dev machine's project dependenices and configures the project itself
+- hosts: dev
+
+  pre_tasks:
+    - include_vars: '{{ item }}'
+      with_items:
+         - folr/vars/app_env.yml
+         - folr/vars/project.yml
+
+  # TODO: The env file needs
+  tasks:
+    - debug: msg='{{ project.data_directory }}/envs/local'
+    # - debug: var=app_env
+    # - name: Create tmuxinator soft links
+    #   shell: bin/link
+    #   args:
+    #     chdir: '{{ project.directory }}/platform/api-common'
+
+  roles:
+    - { role: project-setup, action: 'create-env-file', project_env: '{{ app_env }}' }
+    - { role: project-setup, action: 'clone-repos' }
+    - { role: ruby, ruby_version: '{{ project.ruby_version }}' }
+    # - nodejs
+    - { role: project-setup, action: 'init-rails' }

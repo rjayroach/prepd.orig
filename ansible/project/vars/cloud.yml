@@ -1,0 +1,39 @@
+---
+cloud_defaults:
+  hosts: [www, api, dashboard]
+  ec2:
+    key_name: rjayroach
+
+cloud:
+  development:
+    domain: rjayroach.com
+    env: development
+    ec2:
+      key_name: '{{ cloud_defaults.ec2.key_name }}'
+    ec2s:
+      - { instance_tags: {c_role: master, role: dev}, assign_public_ip: yes,
+          exact_count: 1, image: ami-73974210, instance_type: m3.large }
+      - { instance_tags: {c_role: node}, assign_public_ip: yes,
+          exact_count: 3, image: ami-73974210, instance_type: m3.large }
+    hosts: '{{ cloud_defaults.hosts }}'
+    region: ap-southeast-1
+
+  staging:
+    domain: rhodesedge.io
+    env: staging
+    ec2:
+      key_name: '{{ cloud_defaults.ec2.key_name }}'
+    ec2s:
+      - { instance_tags: {c_role: master, role: dev}, exact_count: 1, image: ami-73974210, instance_type: t2.micro, assign_public_ip: yes }
+    hosts: '{{ cloud_defaults.hosts }}'
+    region: us-east-1
+
+  production:
+    domain: rhodesedge.net
+    env: production
+    ec2:
+      key_name: '{{ cloud_defaults.ec2.key_name }}'
+    ec2s:
+      - { instance_tags: {c_role: master, role: dev}, exact_count: 1, image: ami-73974210, instance_type: t2.micro, assign_public_ip: yes }
+    hosts: '{{ cloud_defaults.hosts }}'
+    region: us-east-1

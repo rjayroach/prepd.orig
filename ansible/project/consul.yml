@@ -1,0 +1,63 @@
+#!/usr/bin/env ansible-playbook
+# NOTE: This playbook installs and configures a docker swarm cluster using Consul and Registrator for service discovery
+---
+- hosts: master
+  tasks:
+    - name: Run Consul container
+      docker_service:
+        project_name: discovery
+        definition:
+          version: '2'
+          services:
+            consul:
+              image: progrium/consul:latest # https://hub.docker.com/r/progrium/consul/
+              command: '--bind=10.100.199.200 -server -bootstrap -ui-dir /ui'
+              network_mode: 'host'
+              # hostname: consul1
+              ports:
+                - '8400:8400'
+                - '8500:8500'
+                - '8600:53'
+
+
+- hosts: [master, node1.local]
+  tasks:
+    - name: Run Swarm container as manager
+      docker_service:
+        project_name: manager
+        definition:
+          version: '2'
+          services:
+            swarm:
+              # docker run -d -p 4000:4000 swarm manage -H :4000 --replication --advertise <manager0_ip>:4000 consul://<consul_ip>:8500
+              image: swarm:latest
+              command: 'manage -H :4000 --replication --advertise {{ ansible_eth1.ipv4.address }}:4000 consul://{{ ansible_eth1.ipv4.address }}:8500'
+              ports:
+                - '4000:4000'
+
+
+- hosts: [node2.local, node3.local]
+  tasks:
+    - name: Run Swarm container as node
+      docker_service:
+        project_name: node
+        definition:
+          version: '2'
+          services:
+            swarm:
+              image: swarm:latest
+              command: 'join --advertise={{ ansible_eth1.ipv4.address }}:2375 consul://10.100.199.200:8500'
+
+    - name: Run Registrator container
+      docker_service:
+        project_name: infra
+        definition:
+          version: '2'
+          services:
+            registrator:  # https://hub.docker.com/r/gliderlabs/registrator/
+              image: gliderlabs/registrator:latest
+              command: '-ip {{ ansible_eth1.ipv4.address }} consul://10.100.199.200:8500'
+              network_mode: host
+              hostname: registrator
+              volumes:
+                - '/var/run/docker.sock:/tmp/docker.sock'

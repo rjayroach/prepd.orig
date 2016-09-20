@@ -1,0 +1,24 @@
+#!/usr/bin/env ansible-playbook
+# NOTE: This playbook provisions:
+# - two-tiered VPC with necessary subnets and security groups
+# - 3 node EC2 cluster (provisioned with Docker Swarm Mode separately)
+# - Elasticache (Redis) and a multi-az RDS
+# - cross-AZ ELBs and updates DNS via Route53
+# ./cloud-cluster.yml -e action=destroy
+---
+- hosts: localhost
+  gather_facts: false
+  connection: local
+
+  pre_tasks:
+    - include_vars: vars/cloud.yml
+
+  roles:
+    - { role: aws, c: '{{ cloud.development }}', mode: "{{ action | default('create') }}" }
+    # - { role: aws, c: '{{ cloud.staging }}', mode: "{{ action | default('create') }}" }
+    # - { role: aws, c: '{{ cloud.production }}', mode: "{{ action | default('create') }}" }
+
+  tasks:
+    # - debug: var=environments
+    # - debug: var=development
+    # - debug: 'msg={{ extra | default("ehllo") }}'

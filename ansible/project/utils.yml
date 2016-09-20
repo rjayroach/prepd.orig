@@ -1,0 +1,14 @@
+#!/usr/bin/env ansible-playbook
+---
+- hosts: dev
+
+  tasks: 
+    - name: 'update yadr 1'
+      shell: 'git pull --rebase'
+      args:
+        chdir: '{{ ansible_env.HOME }}/.yadr'
+
+    - name: 'update yadr 2'
+      shell: 'rake update'
+      args:
+        chdir: '{{ ansible_env.HOME }}/.yadr'

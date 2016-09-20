@@ -1,0 +1,7 @@
+# TODO: Vars applicable for the cluster.yml playbook
+---
+cluster_defaults:
+  key: value
+
+cluster:
+  key: value
