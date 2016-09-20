@@ -3,4 +3,5 @@ developer.yml
 terraform/base/terraform*
 terraform.tfvars
 .vagrant/
-data/
+data/*
+!data/.keep
