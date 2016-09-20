@@ -1,8 +1,5 @@
 Vagrant.configure(2) do |config|
-  # Uncomment for test mode
-  # test_mode = true
-  # testing_dir = '/Users/rjayroach/projects/rjayroach'
-  project_name = Dir.pwd.split('/').last(2).join('-')
+  project_name = Dir.pwd.split('/').last
   config.vm.box = 'debian/contrib-jessie64'
   config.vm.box_check_update = false
   config.vm.provision :shell do |shell|
@@ -22,14 +19,7 @@ Vagrant.configure(2) do |config|
 
   config.vm.define :master, primary: true do |master|
     master.vm.synced_folder '.', '/vagrant', disabled: true
-    # Mounts
-    if defined?(test_mode)
-      master.vm.synced_folder "#{testing_dir}/prepd/files", "/home/vagrant/#{project_name}"
-      master.vm.synced_folder "#{testing_dir}/ansible-roles", "/home/vagrant/#{project_name}/ansible/roles"
-    else
-      master.vm.synced_folder '.', "/home/vagrant/#{project_name}"
-    end
-    # End mounts
+    master.vm.synced_folder '.', "/home/vagrant/#{project_name}"
     master.vm.hostname = "#{project_name}-master"
     master.vm.network 'private_network', ip: '10.100.199.200'
     master.vm.network 'forwarded_port', guest: 2376, host: 2376
@@ -41,7 +31,7 @@ Vagrant.configure(2) do |config|
     master.vm.provision :ansible_local do |ansible|
       ansible.install = false
       ansible.playbook = 'dev.yml'
-      ansible.provisioning_path = "/home/vagrant/#{project_name}/ansible/base"
+      ansible.provisioning_path = "/home/vagrant/#{project_name}/ansible/project"
       ansible.inventory_path = 'inventory'
     end
   end
@@ -49,19 +39,13 @@ Vagrant.configure(2) do |config|
   (1..3).each do |i|
     config.vm.define "node#{i}", autostart: false do |node|
       node.vm.synced_folder '.', '/vagrant', disabled: true
-      # Mounts
-      if defined?(test_mode)
-        node.vm.synced_folder "#{testing_dir}/prepd/files", "/home/vagrant/#{project_name}"
-        node.vm.synced_folder "#{testing_dir}/ansible-roles", "/home/vagrant/#{project_name}/ansible/roles"
-      else
-        node.vm.synced_folder '.', "/home/vagrant/#{project_name}"
-      end
+      node.vm.synced_folder '.', "/home/vagrant/#{project_name}"
       node.vm.hostname = "#{project_name}-node#{i}"
       node.vm.network 'private_network', ip: "10.100.199.20#{i}"
       node.vm.provision :ansible_local do |ansible|
         ansible.install = false
         ansible.playbook = 'cluster.yml'
-        ansible.provisioning_path = "/home/vagrant/#{project_name}/ansible/base"
+        ansible.provisioning_path = "/home/vagrant/#{project_name}/ansible/project"
         ansible.inventory_path = 'inventory'
         ansible.limit = "node#{i}.local"
       end
