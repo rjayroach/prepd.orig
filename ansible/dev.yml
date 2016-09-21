@@ -7,7 +7,7 @@
   pre_tasks:
     - include_vars: '{{ item }}'
       with_first_found:
-         - '../../developer.yml'
+         - '../developer.yml'
          - '~/.ansible-developer.yml'
 
   roles:
