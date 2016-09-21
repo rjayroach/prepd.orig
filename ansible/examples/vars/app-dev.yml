@@ -1,0 +1,41 @@
+---
+project:
+  name: 'my-project'
+  git_account: git@github.com/my_account
+  docker_registry: quay.io/my_account
+
+apps:
+  cool_app_1:
+    name: 'cool_app_1'
+    project: '{{ project }}'
+    source_repos:
+      # NOTE: options:
+      # local: yes; when local is yes then the repo will be added to ~/.bundle/config as a local source 
+      # update: yes; when update is yes then the repo will be refreshed
+      # version: a specific branch to checkout; default is HEAD
+      # db_name: name of database (if not the repo_name)
+      - { name: 'name_of_repo_1', local: yes }
+      - { name: 'name_of_repo_2', local: yes }
+    ruby:
+      version: 2.3.1
+      rails_apps:
+        # NOTE: options:
+        # engine: yes; when engine is yes then the env file will be linked in spec/dummy
+        # bundle: yes; when bundle is yes then bundle will be run after the repository is downloaded
+        - { name: 'name_of_app_1', bundle: yes }
+        - { name: 'name_of_app_2', engine: yes, bundle: yes }
+    docker_images:
+      # NOTE: options:
+      # build_always: yes
+      - { name: 'name_of_app_1' }
+
+  cool_app_2:
+    name: 'cool_app_2'
+    project: '{{ project }}'
+    source_repos:
+      - { name: 'name_of_repo_3' }
+      - { name: 'name_of_repo_4' }
+    ruby:
+      version: 2.3.1
+      rails_apps:
+        - { name: 'name_of_app_3', bundle: yes }

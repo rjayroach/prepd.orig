@@ -1,10 +1,10 @@
-## Configuring Project Applications
+# Adding a new Application to a Project
 
-in ~/project_name/ansible
+Applications are defined using Ansible Playbooks
 
-### Application Installation
+On local (Vagrant) or developer (ec2) master, add the following files in ~/project_name/ansible
 
-#### Application Configuration
+- Create the application installation settings
 
 file: vars/app-dev.yml
 
@@ -20,6 +20,7 @@ This playbook:
 #### Application Templates
 
 file: templates/*
+NOTE: No example currently
 
 ### Application Variables
 
@@ -30,20 +31,7 @@ file: vars/app-vars.yml
 #### Environment Specific - local
 
 file: inventory/group_vars/local/vars.yml
-```yaml
-group_vars:
-  platform:
-    domain: getperx.local
-    envs:
-      DATABASE_HOST: localhost
-      DATABASE_NAME: localhost
-      RABBITMQ_HOST: localhost
-      REDIS_HOST: localhost
-  retail:
-    domain: getperx.local
-    envs:
-      DATABASE_HOST: localhost
-```
+
 
 #### Environment Specific - local (encrypted)
 
