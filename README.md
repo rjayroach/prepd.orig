@@ -56,8 +56,8 @@ cd prepd/files/ansible
 git submodule add git@github.com:rjayroach/ansible-roles roles
 ```
 
-- Add your secret passphrase to .vault_pass.txt
-- Encrypt ansible/secrets.yml
+### Secrets
+prepd will generate a uuid as a secret passphrase to .vault_pass.txt
 
 ```bash
 ansible-vault encrypt secrets/recheck/env --vault-password-file .vault_pass.txt
