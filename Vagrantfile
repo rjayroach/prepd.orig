@@ -7,7 +7,6 @@ Vagrant.configure(2) do |config|
     shell.inline = <<-SHELL
       echo '' >> /home/vagrant/.ssh/authorized_keys
       echo #{ssh_pub_key} >> /home/vagrant/.ssh/authorized_keys
-      mkdir -p /home/vagrant#{project_name}
     SHELL
   end
   config.vm.provision :shell, path: 'bootstrap.sh'
