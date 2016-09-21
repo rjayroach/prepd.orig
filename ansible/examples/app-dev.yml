@@ -23,12 +23,12 @@
         - vars/app-vars.yml
 
   roles:
-    # 'Platform' application
+    # 'cool_app_1' application
     - nginx
     - { role: ruby, ruby_version: '{{ apps.cool_app_1.ruby.version }}' }
-    - { role: app-development, action: 'create-env-file', config: '{{ apps.platform }}', envs: '{{ app_vars.platform.envs }}' }
-    - { role: app-development, action: 'clone-repos', config: '{{ apps.platform }}' }
-    - { role: app-development, action: 'rails-init', config: '{{ apps.platform }}' }
+    - { role: app-development, action: 'create-env-file', config: '{{ apps.cool_app_1 }}', envs: '{{ app_vars.platform.envs }}' }
+    - { role: app-development, action: 'clone-repos', config: '{{ apps.cool_app_1 }}' }
+    - { role: app-development, action: 'rails-init', config: '{{ apps.cool_app_1 }}' }
 
     # 'Retail' application
     - { role: ruby, ruby_version: '{{ apps.cool_app_2.ruby.version }}' }
@@ -47,4 +47,4 @@
     # - name: Create tmuxinator soft links
     #   shell: bin/link
     #   args:
-    #     chdir: '{{ dev.directory }}/platform/api-common'
+    #     chdir: '{{ dev.directory }}/cool_app_1/tmux_files'
