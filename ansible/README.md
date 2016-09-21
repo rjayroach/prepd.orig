@@ -1,7 +1,6 @@
-
 ## Configuring Project Applications
 
-in ~/<project_name>/ansible
+in ~/project_name/ansible
 
 ### Application Installation
 
