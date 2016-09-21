@@ -12,10 +12,10 @@ file: vars/app-dev.yml
 
 file: app-dev.yml
 
-# NOTE: This playbook:
-#   - installs the application's service dependencies on local machine
-#   - pulls the application sources from a repository
-#   - initializes the application(s)
+This playbook:
+- installs the application's service dependencies on local machine
+- pulls the application sources from a repository
+- initializes the application(s)
 
 #### Application Templates
 
