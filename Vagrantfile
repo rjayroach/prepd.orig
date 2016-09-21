@@ -30,7 +30,7 @@ Vagrant.configure(2) do |config|
     master.vm.provision :ansible_local do |ansible|
       ansible.install = false
       ansible.playbook = 'dev.yml'
-      ansible.provisioning_path = "/home/vagrant/#{project_name}/ansible/project"
+      ansible.provisioning_path = "/home/vagrant/#{project_name}/ansible"
       ansible.inventory_path = 'inventory'
     end
   end
@@ -44,7 +44,7 @@ Vagrant.configure(2) do |config|
       node.vm.provision :ansible_local do |ansible|
         ansible.install = false
         ansible.playbook = 'cluster.yml'
-        ansible.provisioning_path = "/home/vagrant/#{project_name}/ansible/project"
+        ansible.provisioning_path = "/home/vagrant/#{project_name}/ansible"
         ansible.inventory_path = 'inventory'
         ansible.limit = "node#{i}.local"
       end
