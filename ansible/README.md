@@ -26,7 +26,7 @@ NOTE: No example currently
 
 #### Global for application
 
-file: vars/app-vars.yml
+file: inventory/group_vars/all/vars.yml
 
 #### Environment Specific - local
 
@@ -68,25 +68,25 @@ Questions:
 3. developer
 - configure developer specific settings, e.g. git and docker credentials
 
-## Project Setup
+## Setup Project for Development
 
 1. Configure Project Vars
-- project-vars.yml: project vars for GH; use Redis, yes, no
+- inventory/group_vars/dev/vars.yml: project vars for GH, docker, etc
 
 ### Development Environment
 
 Provision Infrastructure on VMs on Laptop
 
 1. Instantiate VirtualBox Hosts
-- local-machines.yml (formally provision.yml) - brings up the VM hosts and installs basic packages
+- dev.yml - brings up the VM hosts and installs basic packages
 - install ansible
 - install docker
 
 2. Bring up a docker swarm cluster 
-- swarm-cluster.yml: requires ansible to get the IP address
+- cluster.yml: requires ansible to get the IP address
 
-3. Provision Infrastructure
-- TODO: local-services.yml: installs the project's supporting services, e.g. Postgres and Redis, directly onto the VMs and configures root pwd, etc
+3. Configure Project Infrastructure
+- app-development.yml: installs the project's supporting services, e.g. Postgres and Redis, directly onto the VMs and configures root pwd, etc
 
 OR
 - swarm-services.yml: install the project's supporting services defined in docker-compose-services.yml into the cluster and configures root pwd, etc

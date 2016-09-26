@@ -1,0 +1,12 @@
+# NOTE: app and app_vault values come from group_vars
+#       values that do not come from there are 'global' to all environments
+# TODO: Perhpas this and project.yml should be in host_vars with ln -s between environments
+# TODO: Test this with running a docker container using compose
+---
+all_vars:
+  cool_app_1:
+    envs:
+      ALL_VAR: test
+  cool_app_2:
+    envs:
+      ALL_VAR: 5

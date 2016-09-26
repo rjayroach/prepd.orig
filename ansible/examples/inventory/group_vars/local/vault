@@ -1,9 +1,0 @@
-# NOTE: This is the unencrypted versio
-# Access this using ansible-vault from the project directory, e.g.:
-# ansible-vault edit inventory/group_vars/local/vault
----
-group_vault:
-  cool_app_1:
-    envs:
-      DATABASE_USERNAME: vagrant
-      DATABASE_PASSWORD: vagrant

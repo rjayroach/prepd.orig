@@ -2,11 +2,11 @@
 cloud_defaults:
   hosts: [www, api, dashboard]
   ec2:
-    key_name: rjayroach
+    key_name: key-name-for-ssh
 
 cloud:
   development:
-    domain: rjayroach.com
+    domain: development.com
     env: development
     ec2:
       key_name: '{{ cloud_defaults.ec2.key_name }}'
@@ -19,7 +19,7 @@ cloud:
     region: ap-southeast-1
 
   staging:
-    domain: rhodesedge.io
+    domain: staging.com
     env: staging
     ec2:
       key_name: '{{ cloud_defaults.ec2.key_name }}'
@@ -29,7 +29,7 @@ cloud:
     region: us-east-1
 
   production:
-    domain: rhodesedge.net
+    domain: production.com
     env: production
     ec2:
       key_name: '{{ cloud_defaults.ec2.key_name }}'

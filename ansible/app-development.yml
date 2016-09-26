@@ -1,0 +1,57 @@
+#!/usr/bin/env ansible-playbook
+# NOTE: This playbook:
+#   - installs the application's service dependencies on local machine
+#   - pulls the application sources from a repository
+#   - initializes the application(s)
+# TODO: Test this with running a docker container using compose
+---
+- hosts: dev
+  vars:
+    # NOTE: all_vault and all_vars come from vault and vars.yml in the inventory/group_vars/all directory (these values are 'global' to all environments)
+    # NOTE: env_vault and env_vars come from vault and vars.yml in the inventory/group_vars/<env> directory (these values are specific to the current environment)
+    app_vars:
+      cool_app_1:
+        some_var: 7
+        envs: '{{ all_vault.cool_app_1.envs | combine(all_vars.cool_app_1.envs) | combine(env_vault.cool_app_1.envs) | combine(env_vars.cool_app_1.envs) }}'
+      cool_app_2:
+        some_var: 7
+        envs: '{{ all_vault.cool_app_2.envs | combine(all_vars.cool_app_2.envs) | combine(env_vault.cool_app_2.envs) | combine(env_vars.cool_app_2.envs) }}'
+
+  tasks:
+    - debug: var=project
+    - debug: var=app_vars
+
+- hosts: ydev
+  roles:
+    # NOTE: Uses inventory/group_vars/<group>/vars.yml to create PG user
+    # - postgres
+    # - redis
+    # - nodejs
+    # 'cool_app_1' application
+    # - nginx
+    # - { role: ruby, ruby_version: '{{ apps.cool_app_1.ruby.version }}' }
+    # - { role: app-development, action: 'create-env-file', config: '{{ apps.cool_app_1 }}', envs: '{{ app_vars.cool_app_1.envs }}' }
+    # - { role: app-development, action: 'clone-repos', config: '{{ apps.cool_app_1 }}' }
+    # - { role: app-development, action: 'rails-init', config: '{{ apps.cool_app_1 }}' }
+
+    # 'cool_app_2' application
+    # - { role: ruby, ruby_version: '{{ apps.cool_app_2.ruby.version }}' }
+    # - { role: app-development, action: 'create-env-file', config: '{{ apps.cool_app_2 }}', envs: '{{ app_vars.cool_app_2.envs }}' }
+    # - { role: app-development, action: 'clone-repos', config: '{{ apps.cool_app_2 }}' }
+    # - { role: app-development, action: 'rails-init', config: '{{ apps.cool_app_2 }}' }
+
+  tasks:
+    - name: Configure nginx to forward requests to app server and dashboard
+      template:
+        src: templates/nginx-default
+        dest: /etc/nginx/sites-enabled/default
+        mode: 0644
+      become: yes
+      notify: Restart Nginx
+
+    # TODO: Linking in tmuxinator files should probably belong to the project itself
+    # NOTE: Linking .env files could also be part of the project, in a bin/setup script or so
+    # - name: Create tmuxinator soft links
+    #   shell: bin/link
+    #   args:
+    #     chdir: '{{ dev.directory }}/cool_app_1/api-common'
