@@ -1,7 +1,5 @@
 #!/usr/bin/env ansible-playbook
 # NOTE: This playbook installs and configures a docker swarm cluster on Vagrant hosts
-# TODO: Remove machine_env from project group_vars
-# TODO: If abstract the IP addresses from here then can run in other environments
 ---
 - hosts: master
 
@@ -32,19 +30,3 @@
   roles:
     - common
     - docker
-
-
-# Update configuration on every node (worker nodes, inculding master; aka cluster)
-- hosts: cluster
-  become: yes
-
-  tasks:
-    - name: Add mappings to /etc/hosts
-      blockinfile:
-        dest: /etc/hosts
-        marker: '# {mark} ANSIBLE MANAGED BLOCK (cluster.yml)'
-        block: |
-          10.100.199.200 node0.local
-          10.100.199.201 node1.local
-          10.100.199.202 node2.local
-          10.100.199.203 node3.local
