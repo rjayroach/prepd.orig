@@ -28,16 +28,6 @@ Project is defined in run/docker-compose.override.yml See [docker](https://docs.
 - Ember app
 
 
-## Requirements
-
-- VirtualBox
-- Vagrant
-- Vagrant plugins
-
-```bash
-vagrant plugin install vagrant-vbguest
-vagrant plugin install vagrant-cachier
-```
 
 ## Nodes
 
@@ -58,14 +48,24 @@ git submodule add git@github.com:rjayroach/ansible-roles roles
 
 ### Secrets
 prepd will generate a uuid as a secret passphrase to .vault_pass.txt
+ansible.cfg will use the passphrase when dealing with encrypted data
+encrypted files are created per environment in a file named vault
+use ansible-vault to edit an encrypted file, e.g.:
 
 ```bash
-ansible-vault encrypt secrets/recheck/env --vault-password-file .vault_pass.txt
+cd ansible
+ansible-vault edit inventory/group_vars/all/vault
 ```
+
+### Connect to local machine
 
 ```bash
 vagrant up
+vagrant ssh node0 or ssh -A node0.{project_name}.local
+cd {project_name}/ansible
+run the role configuration, e.g ./dev.yml
 ```
+
 
 ## Examples
 

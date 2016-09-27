@@ -10,10 +10,10 @@
 
 [env_local]
 # node[0:4].example.com
-node0.local ansible_ssh_host=10.100.199.200 ansible_user=vagrant
-node1.local ansible_ssh_host=10.100.199.201 ansible_user=vagrant
-node2.local ansible_ssh_host=10.100.199.202 ansible_user=vagrant
-node3.local ansible_ssh_host=10.100.199.203 ansible_user=vagrant
+node0.local ansible_user=vagrant
+node1.local ansible_user=vagrant
+node2.local ansible_user=vagrant
+node3.local ansible_user=vagrant
 
 
 [production:children]
