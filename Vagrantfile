@@ -22,6 +22,10 @@ Vagrant.configure(2) do |config|
   config.hostmanager.ignore_private_ip = false
 
   config.vm.define :master, primary: true do |master|
+    node0.vm.provider :virtualbox do |v|
+      v.name = "node0.#{project_name}.local"
+    end
+
     master.vm.synced_folder '.', '/vagrant', disabled: true
     master.vm.synced_folder '.', "/home/vagrant/#{project_name}"
 
@@ -36,31 +40,35 @@ Vagrant.configure(2) do |config|
     end
 
     # Port Forwarding
-    master.vm.network 'forwarded_port', guest: 2376, host: 2376
-    master.vm.network 'forwarded_port', guest: 2375, host: 2375
-    master.vm.network 'forwarded_port', guest: 3000, host: 3000
-    master.vm.network 'forwarded_port', guest: 4200, host: 4200
-    master.vm.network 'forwarded_port', guest: 7357, host: 7357
-    master.vm.network 'forwarded_port', guest: 35729, host: 35729
+    node0.vm.network 'forwarded_port', guest: 2376, host: 2376, auto_correct: true    # docker
+    node0.vm.network 'forwarded_port', guest: 2375, host: 2375, auto_correct: true    # docker
+    node0.vm.network 'forwarded_port', guest: 3000, host: 3000, auto_correct: true    # rails
+    node0.vm.network 'forwarded_port', guest: 4200, host: 4200, auto_correct: true    # ember
+    node0.vm.network 'forwarded_port', guest: 7357, host: 7357, auto_correct: true    #
+    node0.vm.network 'forwarded_port', guest: 35729, host: 35729, auto_correct: true  # reload
 
     # Configuration
     master.vm.provision :ansible_local do |ansible|
       ansible.install = false
       ansible.playbook = 'dev.yml'
       ansible.provisioning_path = "/home/vagrant/#{project_name}/ansible"
-      ansible.inventory_path = 'inventory'
+      ansible.inventory_path = 'inventory/hosts'
     end
   end
 
   (1..3).each do |i|
     config.vm.define "node#{i}", autostart: false do |node|
+      node.vm.provider :virtualbox do |v|
+        v.name = "node#{i}.#{project_name}.local"
+      end
+
       node.vm.synced_folder '.', '/vagrant', disabled: true
       node.vm.synced_folder '.', "/home/vagrant/#{project_name}"
 
       # Networking
       node.vm.hostname = "node#{i}.#{project_name}.local"
       node.vm.network 'private_network', type: :dhcp
-      node.hostmanager.aliases = ['node1.local']
+      node.hostmanager.aliases = ["node#{i}.local"]
       node.hostmanager.ip_resolver = proc do |vm, resolving_vm|
         if hostname = (vm.ssh_info && vm.ssh_info[:host])
           `vagrant ssh node#{i} -c "/sbin/ifconfig eth1" | grep "inet addr" | tail -n 1 | egrep -o "[0-9\.]+" | head -n 1 2>&1`.split("\n").first[/(\d+\.\d+\.\d+\.\d+)/, 1]
@@ -72,7 +80,7 @@ Vagrant.configure(2) do |config|
         ansible.install = false
         ansible.playbook = 'cluster.yml'
         ansible.provisioning_path = "/home/vagrant/#{project_name}/ansible"
-        ansible.inventory_path = 'inventory'
+        ansible.inventory_path = 'inventory/hosts'
         ansible.limit = "node#{i}.local"
       end
     end
