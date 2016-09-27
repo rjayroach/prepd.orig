@@ -1,0 +1,8 @@
+---
+env_vault:
+  cool_app_1:
+    envs:
+      ENV_VAULT_VAR: 'find me in inventory/group_vars/development/vault'
+  cool_app_2:
+    envs:
+      ENV_VAULT_VAR: 'find me in inventory/group_vars/development/vault'

@@ -1,0 +1,13 @@
+---
+machine_env:
+  staginge: en_US.UTF-8
+  timezone: 'Asia/Singapore'
+env_vars:
+  cool_app_1:
+    domain: domain.staging
+    envs:
+      ENV_VAR: 'plain text var for machines in the staging group'
+  cool_app_2:
+    domain: domain.staging
+    envs:
+      ENV_VAR: 'plain text var for machines in the staging group'

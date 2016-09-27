@@ -1,0 +1,13 @@
+---
+machine_env:
+  locale: en_US.UTF-8
+  timezone: 'Asia/Singapore'
+env_vars:
+  cool_app_1:
+    domain: domain.development
+    envs:
+      ENV_VAR: 'plain text var for machines in the development group'
+  cool_app_2:
+    domain: domain.development
+    envs:
+      ENV_VAR: 'plain text var for machines in the development group'
