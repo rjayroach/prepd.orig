@@ -21,19 +21,19 @@ Vagrant.configure(2) do |config|
   config.hostmanager.manage_guest = true
   config.hostmanager.ignore_private_ip = false
 
-  config.vm.define :master, primary: true do |master|
+  config.vm.define :node0, primary: true do |node0|
     node0.vm.provider :virtualbox do |v|
       v.name = "node0.#{project_name}.local"
     end
 
-    master.vm.synced_folder '.', '/vagrant', disabled: true
-    master.vm.synced_folder '.', "/home/vagrant/#{project_name}"
+    node0.vm.synced_folder '.', '/vagrant', disabled: true
+    node0.vm.synced_folder '.', "/home/vagrant/#{project_name}"
 
     # Networking
-    master.vm.network 'private_network', type: :dhcp
-    master.vm.hostname = "node0.#{project_name}.local"
-    master.hostmanager.aliases = ["node0.local"]
-    master.hostmanager.ip_resolver = proc do |vm, resolving_vm|
+    node0.vm.network 'private_network', type: :dhcp
+    node0.vm.hostname = "node0.#{project_name}.local"
+    node0.hostmanager.aliases = ["node0.local"]
+    node0.hostmanager.ip_resolver = proc do |vm, resolving_vm|
       if hostname = (vm.ssh_info && vm.ssh_info[:host])
         `vagrant ssh -c "/sbin/ifconfig eth1" | grep "inet addr" | tail -n 1 | egrep -o "[0-9\.]+" | head -n 1 2>&1`.split("\n").first[/(\d+\.\d+\.\d+\.\d+)/, 1]
       end
@@ -48,7 +48,7 @@ Vagrant.configure(2) do |config|
     node0.vm.network 'forwarded_port', guest: 35729, host: 35729, auto_correct: true  # reload
 
     # Configuration
-    master.vm.provision :ansible_local do |ansible|
+    node0.vm.provision :ansible_local do |ansible|
       ansible.install = false
       ansible.playbook = 'dev.yml'
       ansible.provisioning_path = "/home/vagrant/#{project_name}/ansible"
