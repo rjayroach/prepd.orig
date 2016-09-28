@@ -1,6 +1,6 @@
 .vault-password.txt
 developer.yml
-terraform/project/terraform*
+terraform/terraform*
 terraform.tfvars
 .vagrant/
 data/*
