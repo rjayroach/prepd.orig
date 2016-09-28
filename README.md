@@ -15,15 +15,15 @@ which creates a 3 node cluster with basic serivces
 node0 can run without other nodes
 
 
-### Roles
+## Roles
 
-#### Dev
+### Dev
 
 This includes only node0 in the 'dev' role
 
 - node0: a 'master' machine for development, testing, building images, load balancing and managing a docker swarm cluster
 
-#### Cluster
+### Cluster
 
 This includes node0 in the 'master' role
 
@@ -32,9 +32,9 @@ This includes node0 in the 'master' role
 - node2: Consul, Registrator, Redis (Elasticache)
 - node3: Consul, Registrator, DynamoDB
 
-### Environments
+## Environments
 
-#### Local and Development
+### Local and Development
 
 Local (vagrant) and Development (AWS) have common functionality in that they can both implement either 'dev' or 'dev' and 'cluster' roles
 When just using the 'dev' role then it is a single machine with the applications and the supporting services, e.g. PG, Redis, etc.
@@ -42,7 +42,7 @@ When just using the 'dev' role then it is a single machine with the applications
 However, when the 'cluster' role is applied a docker swarm network is created to emulate a cluster running on cloud (AWS) resources in production
 
 
-#### Staging and Production Environments
+### Staging and Production Environments
 
 This assumes that supporting services may be installed using AWS (RDS, Elasticache, etc) or as services installed directly on EC2s or as docker
 containers
