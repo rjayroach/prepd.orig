@@ -1,12 +1,18 @@
 # Prepd-project
 
-Provides a working stand-alone provisioning system based on Ansible which when managed with the Prepd gem
-automates project and application setup. Ansible playbooks are the primary tool used to provision the
+Prepd-project is a set of Ansible playbooks which when combined with these
+[Ansible roles](https://github.com/rjayroach/ansible-roles/) provides a set of infrastructure blueprints
+for development, staging and production in which to deploy a project with one or more applications
+
+The blueprints work as a stand-alone provisioning system based on Ansible, however when they are  managed with the Prepd gem
+project and application setup becomes fully automated.
+Regardless of whether Prepd is invoked or not, Ansible playbooks are the primary tool used to provision the
 infrastructure across four specific environments: local, devleopment, staging and production
+
 
 ## Default infrastructure
 
-The Vagrantfile (for local) and Ansible playbooks (for all other environments) prvoides a Default Infrastructure
+The Vagrantfile (for local) and the Ansible playbooks (for all other environments) provision a Default Infrastructure
 which creates a 3 node cluster with basic serivces
 
 - node0: This is the primary machine for development and management of cluster services
