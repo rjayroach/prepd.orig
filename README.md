@@ -4,10 +4,10 @@ Prepd-project is a set of Ansible playbooks which when combined with these
 [Ansible roles](https://github.com/rjayroach/ansible-roles/) provides a set of infrastructure blueprints
 for development, staging and production in which to deploy a project with one or more applications
 
-The blueprints work as a stand-alone provisioning system based on Ansible, however when they are  managed with the Prepd gem
-project and application setup becomes fully automated.
-Regardless of whether Prepd is invoked or not, Ansible playbooks are the primary tool used to provision the
-infrastructure across four specific environments: local, devleopment, staging and production
+The blueprints provide a stand-alone provisioning system based on Ansible, however
+when they are managed with the Prepd gem, project and application setup becomes fully automated.
+Regardless of whether Prepd is used to manage the blueprints, Ansible playbooks are the primary tool used to
+provision the infrastructure across four specific environments: local, devleopment, staging and production
 
 
 ## Default infrastructure
