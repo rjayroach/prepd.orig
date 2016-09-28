@@ -6,6 +6,7 @@ for development, staging and production in which to deploy a project with one or
 
 The blueprints provide a stand-alone provisioning system based on Ansible, however
 when they are managed with the Prepd gem, project and application setup becomes fully automated.
+
 Regardless of whether Prepd is used to manage the blueprints, Ansible playbooks are the primary tool used to
 provision the infrastructure across four specific environments: local, devleopment, staging and production
 
