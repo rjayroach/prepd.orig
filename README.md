@@ -42,7 +42,7 @@ When just using the 'dev' role then it is a single machine with the applications
 However, when the 'cluster' role is applied a docker swarm network is created to emulate a cluster running on cloud (AWS) resources in production
 
 
-### Staging and Production Environments
+### Staging and Production
 
 This assumes that supporting services may be installed using AWS (RDS, Elasticache, etc) or as services installed directly on EC2s or as docker
 containers
@@ -62,13 +62,15 @@ Project is defined in run/docker-compose.override.yml See [docker](https://docs.
 - Ember app
 
 
-## Using
+## Installing
 
 ```bash
-git clone git@github.com:rjayroach/prepd.git
-cd prepd/files/ansible
+git clone git@github.com:rjayroach/prepd-project.git
+cd prepd-project/ansible
 git submodule add git@github.com:rjayroach/ansible-roles roles
 ```
+
+## Using
 
 ### Secrets
 prepd will generate a uuid as a secret passphrase to .vault_pass.txt
@@ -87,7 +89,7 @@ ansible-vault edit inventory/group_vars/all/vault
 vagrant up
 vagrant ssh node0 or ssh -A node0.{project_name}.local
 cd {project_name}/ansible
-run the role configuration, e.g ./dev.yml
+./dev.yml # runs the role configuration
 ```
 
 
