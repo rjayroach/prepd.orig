@@ -9,11 +9,7 @@
 [tag_env_development]
 
 [env_local]
-# node[0:4].example.com
-node0.local ansible_user=vagrant
-node1.local ansible_user=vagrant
-node2.local ansible_user=vagrant
-node3.local ansible_user=vagrant
+node[0:4].local ansible_user=vagrant
 
 
 [production:children]

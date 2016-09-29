@@ -1,0 +1,11 @@
+# NOTE: all_vault and all_vars come from vault and vars.yml in the inventory/group_vars/all directory (these values are 'global' to all environments)
+# NOTE: env_vault and env_vars come from vault and vars.yml in the inventory/group_vars/<env> directory (these values are specific to the current environment)
+---
+vars:
+  app_vars:
+    cool_app_1:
+      some_var: 7
+      envs: '{{ all_vault.cool_app_1.envs | combine(all_vars.cool_app_1.envs) | combine(env_vault.cool_app_1.envs) | combine(env_vars.cool_app_1.envs) }}'
+    cool_app_2:
+      some_var: 7
+      envs: '{{ all_vault.cool_app_2.envs | combine(all_vars.cool_app_2.envs) | combine(env_vault.cool_app_2.envs) | combine(env_vars.cool_app_2.envs) }}'
