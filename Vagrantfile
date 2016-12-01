@@ -40,12 +40,13 @@ Vagrant.configure(2) do |config|
     end
 
     # Port Forwarding
-    node0.vm.network 'forwarded_port', guest: 2376, host: 2376, auto_correct: true    # docker
     node0.vm.network 'forwarded_port', guest: 2375, host: 2375, auto_correct: true    # docker
+    node0.vm.network 'forwarded_port', guest: 2376, host: 2376, auto_correct: true    # docker
     node0.vm.network 'forwarded_port', guest: 3000, host: 3000, auto_correct: true    # rails
     node0.vm.network 'forwarded_port', guest: 4200, host: 4200, auto_correct: true    # ember
     node0.vm.network 'forwarded_port', guest: 7357, host: 7357, auto_correct: true    #
     node0.vm.network 'forwarded_port', guest: 35729, host: 35729, auto_correct: true  # reload
+    node0.vm.network 'forwarded_port', guest: 49152, host: 49152, auto_correct: true  # reload
 
     # Configuration
     node0.vm.provision :ansible_local do |ansible|
