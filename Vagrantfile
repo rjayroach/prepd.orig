@@ -1,5 +1,6 @@
 Vagrant.configure(2) do |config|
-  project_name = Dir.pwd.split('/').pop(2).reverse.join('.')
+  host_name = Dir.pwd.split('/').pop(2).reverse.join('.')
+  project_name = Dir.pwd.split('/').last
   config.vm.box = 'debian/contrib-jessie64'
   config.vm.box_check_update = false
   config.vm.provision :shell do |shell|
@@ -24,7 +25,7 @@ Vagrant.configure(2) do |config|
 
   config.vm.define :node0, primary: true do |node0|
     node0.vm.provider :virtualbox do |v|
-      v.name = "node0.#{project_name}.local"
+      v.name = "node0.#{host_name}.local"
     end
 
     node0.vm.synced_folder '.', '/vagrant', disabled: true
@@ -32,7 +33,7 @@ Vagrant.configure(2) do |config|
 
     # Networking
     node0.vm.network 'private_network', type: :dhcp
-    node0.vm.hostname = "node0.#{project_name}.local"
+    node0.vm.hostname = "node0.#{host_name}.local"
     node0.hostmanager.aliases = ["node0.local"]
     node0.hostmanager.ip_resolver = proc do |vm, resolving_vm|
       if hostname = (vm.ssh_info && vm.ssh_info[:host])
@@ -61,14 +62,14 @@ Vagrant.configure(2) do |config|
   (1..3).each do |i|
     config.vm.define "node#{i}", autostart: false do |node|
       node.vm.provider :virtualbox do |v|
-        v.name = "node#{i}.#{project_name}.local"
+        v.name = "node#{i}.#{host_name}.local"
       end
 
       node.vm.synced_folder '.', '/vagrant', disabled: true
       node.vm.synced_folder '.', "/home/vagrant/#{project_name}"
 
       # Networking
-      node.vm.hostname = "node#{i}.#{project_name}.local"
+      node.vm.hostname = "node#{i}.#{host_name}.local"
       node.vm.network 'private_network', type: :dhcp
       node.hostmanager.aliases = ["node#{i}.local"]
       node.hostmanager.ip_resolver = proc do |vm, resolving_vm|
