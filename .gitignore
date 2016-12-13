@@ -1,4 +1,5 @@
 .vault-password.txt
+.terraform-vars.txt
 developer.yml
 terraform/terraform*
 terraform.tfvars
