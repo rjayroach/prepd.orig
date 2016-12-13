@@ -1,5 +1,5 @@
 Vagrant.configure(2) do |config|
-  project_name = Dir.pwd.split('/').last
+  project_name = Dir.pwd.split('/').pop(2).reverse.join('.')
   config.vm.box = 'debian/contrib-jessie64'
   config.vm.box_check_update = false
   config.vm.provision :shell do |shell|
