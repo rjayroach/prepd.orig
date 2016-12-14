@@ -1,6 +1,7 @@
-.vault-password.txt
+.boto
+.developer.yml
 .terraform-vars.txt
-developer.yml
+.vault-password.txt
 terraform/terraform*
 terraform.tfvars
 .vagrant/
