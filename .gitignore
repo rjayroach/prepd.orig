@@ -1,7 +1,9 @@
 .boto
 .developer.yml
+.id_rsa*
 .terraform-vars.txt
 .vault-password.txt
+ansible/inventory/ec2.*
 terraform/terraform*
 terraform.tfvars
 .vagrant/
