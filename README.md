@@ -15,7 +15,7 @@ Prepd-project is a set of Terraform Plans and Ansible Playbooks to manage Infras
 - Create the project in prepd
 
 ```ruby
-c = Client.create(name: ‘c2p4’)
+c = Client.create(name: 'c2p4')
 ```
 
 ### New Project
@@ -25,10 +25,10 @@ c = Client.create(name: ‘c2p4’)
 - use prepd to create the project using the repo_url and path names (tf_creds and ansible_creds) to CSV files
 
 ```ruby
-c = Client.find_by(name: ‘c2p4’)
-c.projects.new(name: ‘legos’, repo_url: ‘git@github.com:my_git_hub_account/legos.git)
-c.tf_creds = ‘Users/dude/aws/legos-terraform.csv'
-c.ansible_creds = ‘Users/dude/aws/legos-ansible.csv'
+c = Client.find_by(name: 'c2p4')
+c.projects.new(name: 'legos', repo_url: 'git@github.com:my_git_hub_account/legos.git')
+c.tf_creds = 'Users/dude/aws/legos-terraform.csv'
+c.ansible_creds = 'Users/dude/aws/legos-ansible.csv'
 c.save
 ```
 
