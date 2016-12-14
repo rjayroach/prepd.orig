@@ -38,12 +38,12 @@ c.save
 ### Project Credentials
 Prepd will create the following credential (hidden) files in project_root:
 
-.boto: AWS IAM credentials that give read only access to Ansible
-.developer.yml: Developer’s git account (and other account) details
-.terraform-vars.txt: AWS IAM credentials that give full access to CRUD AWS resources
-.vault-password.txt: a UUID used to encrypt and decrypt ansible vault files
-.id_rsa.pub: the public key uploaded to AWS as the primary key pair for accessing EC2 instances
-.id_rsa: the private key
+- .boto: AWS IAM credentials that give read only access to Ansible
+- .developer.yml: Developer’s git account (and other account) details
+- .terraform-vars.txt: AWS IAM credentials that give full access to CRUD AWS resources
+- .vault-password.txt: a UUID used to encrypt and decrypt ansible vault files
+- .id_rsa.pub: the public key uploaded to AWS as the primary key pair for accessing EC2 instances
+- .id_rsa: the private key
 
 When cloning this project to a new machine these files will need to be manually copied to the new machine as they are not stored in the repository
 
@@ -55,7 +55,7 @@ The developer uses ssh-agent forwarding to access the machine from the VM
 - dev.yml will check if the project_root and: 1) if .boto exists link it, 2) if id_rsa and id_rsa.pub exist then link them
 - the developer can then do ssh-add which will auto load ~/.ssh/id_rsa to login or run ansible
 
-### NOTEs on EC2 Key Pair:
+### EC2 Key Pair
 - Terraform does not create key pairs and can only upload an existing key pair
 - key pairs in AWS are stored by region so it makes sense to generate a key pair on the localhost and upload the key_material to AWS as necessary per region
 - Terraform is the single tool to manage infrastructure so it must upload the key pair
