@@ -5,10 +5,7 @@
 - hosts: dev
 
   pre_tasks:
-    - include_vars: '{{ item }}'
-      with_first_found:
-         - '../developer.yml'
-         - '~/.ansible-developer.yml'
+    - include_vars: '../.developer.yml'
 
   roles:
     - common
@@ -20,13 +17,11 @@
 - hosts: dev:&env_local
 
   roles:
+    - prepd
     - terraform
-    # NOTE: Example of how to test a new role:
-    # invoke this playbook using: ./dev.yml --tags test
-    # - { role: terraform, tags: 'test' }
-  # TODO: If ec2.py is in the inventory then it will be called by node config as well
+
   tasks:
-    - name: install boto
+    - name: Install boto
       pip: 
         name: boto
         state: present

@@ -65,9 +65,12 @@ The developer uses ssh-agent forwarding to access the machine from the VM
 
 
 ## Using
-- Initialize the VM: run vagrant up; this will run dev.yml to setup the machine for development
-TODO: (for dev.yml)
-- if project-root/.boto exists then link it to ~/.boto and download ec2.py and ec2.ini and chmod ec2.py
+
+- Initialize the VM (the provisioner will automatically setup the machine for development)
+
+```bash
+vagrant up
+```
 
 
 ## Description
