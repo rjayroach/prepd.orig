@@ -1,3 +1,4 @@
+# inventory/group_vars/local/vars.yml
 ---
 machine_env:
   locale: en_US.UTF-8

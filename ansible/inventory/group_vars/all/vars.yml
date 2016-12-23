@@ -1,3 +1,4 @@
+# inventory/group_vars/all/vars.yml
 ---
 default_api_all:
   ALL_VAR: default-api-value
