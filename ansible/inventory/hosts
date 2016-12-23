@@ -5,7 +5,7 @@
 #   Name        = "node1"
 #   Role        = "cluster-manager" "cluster-node"
 
-# Development
+### Environments
 [tag_Environment_development]
 node0.local ansible_user=vagrant
 
@@ -13,7 +13,6 @@ node0.local ansible_user=vagrant
 tag_Environment_development
 
 
-# Local
 [tag_Environment_local]
 node[0:3].local ansible_user=vagrant
 
@@ -21,14 +20,12 @@ node[0:3].local ansible_user=vagrant
 tag_Environment_local
 
 
-# Staging
 [tag_Environment_staging]
 
 [staging:children]
 tag_Environment_staging
 
 
-# Production
 [tag_Environment_production]
 
 [production:children]
