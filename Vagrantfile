@@ -56,6 +56,7 @@ Vagrant.configure(2) do |config|
       ansible.playbook = 'config-development.yml'
       ansible.provisioning_path = "/home/vagrant/#{project_name}/ansible"
       ansible.inventory_path = 'inventory/hosts'
+      ansible.limit = "node0.local"
     end
   end
 

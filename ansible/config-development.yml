@@ -1,6 +1,5 @@
 #!/usr/bin/env ansible-playbook
-# NOTE: This playbook installs all the application dependenices for development
-# on the 'dev' machine so it is a stand-alone product
+# NOTE: This playbook installs dependenices for application development AND infrastructure management
 ---
 - hosts: development
 

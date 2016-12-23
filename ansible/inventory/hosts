@@ -15,7 +15,7 @@ tag_Environment_development
 
 # Local
 [tag_Environment_local]
-node[1:3].local ansible_user=vagrant
+node[0:3].local ansible_user=vagrant
 
 [local:children]
 tag_Environment_local
