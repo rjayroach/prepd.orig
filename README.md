@@ -162,18 +162,17 @@ git submodule add git@github.com:rjayroach/ansible-roles roles
 ### Locations
 
 Variables are stored in either of two locations:
-- a sub-directory of the inventory/group_vars directory
-- a sub-directory of the inventory/host_vars directory
+- inventory/group_vars/all
+- inventory/group_vars/<environment>
 
-The sub-directory matches either the name of the environment, e.g. local, development, staging or production
-or it matches the name of a role, e.g. dev
+The sub-directory matches either the name of the environment, e.g. development, local, staging or production
 
 Variables are stored in either plain text files (vars.yml) or encrypted files (vault)
 
 Examples:
 - vars that apply to the local environment are located in `inventory/group_vars/local/vars.yml`
 - encrypted vars that apply to all environemnts are located in `inventory/group_vars/all/vault`
-- vars that apply to dev (local and development) are set in `inventory/group_vars/dev/vars.yml`
+- vars that apply to dev (local and development) are set in `inventory/group_vars/development/vars.yml`
 
 Source code repositories and other dev related info is stored inventory/group_vars/dev/vars.yml
 
