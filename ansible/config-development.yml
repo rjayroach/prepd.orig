@@ -1,0 +1,25 @@
+#!/usr/bin/env ansible-playbook
+# NOTE: This playbook installs all the application dependenices for development
+# on the 'dev' machine so it is a stand-alone product
+---
+- hosts: development
+
+  pre_tasks:
+    - include_vars: '../.developer.yml'
+
+  roles:
+    - common
+    - yadr
+    - developer
+    - developer-tools
+    - { role: ruby, ruby_version: 2.3.3 }
+    - ember
+    - postgres
+    - c2p4-dev
+
+
+- hosts: development:&local
+
+  roles:
+    - prepd
+    - terraform

@@ -1,0 +1,16 @@
+#!/usr/bin/env ansible-playbook
+# NOTE: Installs and configures docker swarm mode on a cluster
+---
+- hosts: cluster-manager:&staging
+
+  roles:
+    - { role: consul-cluster, consul_role: manager }
+
+  tasks:
+    - debug: msg='cluster-node:&staging'
+
+
+- hosts: cluster-node:&staging
+
+  tasks:
+    - debug: msg='cluster-node:&staging'

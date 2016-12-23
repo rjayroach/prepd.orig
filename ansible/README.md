@@ -1,62 +1,26 @@
-# Adding a new Application to a Project
+# Using
+
+## Adding a new Application to the Application Group
 
 Applications are defined using Ansible Playbooks
 
-On local (Vagrant) or developer (ec2) master, add the following files in ~/project_name/ansible
+In the Developer IE, add the following files in ~/project_name/ansible:
 
 - Create the application installation settings
 
-file: vars/app-dev.yml
 
-#### Services and source code
+# Notes
 
-file: app-dev.yml
+## Services and source code
+
+file: config-development.yml
 
 This playbook:
 - installs the application's service dependencies on local machine
 - pulls the application sources from a repository
 - initializes the application(s)
 
-#### Application Templates
-
-file: templates/*
-NOTE: No example currently
-
-### Application Variables
-
-#### Global for application
-
-file: inventory/group_vars/all/vars.yml
-
-#### Environment Specific - local
-
-file: inventory/group_vars/local/vars.yml
-
-
-#### Environment Specific - local (encrypted)
-
-file: inventory/group_vars/local/vault
-
-
-
-## Getting docker running with Ansible
-
-1. build the base image as a separate project
-2. build folr5 as a docker image using ansible
-
-Questions:
-- using a single Dockerfile for multiple projects
-- need to get the env file setup for the proper environment and specify in folr/docker-compose.yml
-- this should get the correct env file for the environment
-
-
-
-## Setup
-
-1. Copy ../developer.yml.example to ../developer.yml and edit with your credentials
-2. Create ../vault-password.txt
-
-## Notes on Roles
+## Ansible Roles
 
 1. common
 - install packages common across all servers, e.g. tcpdump, tmux

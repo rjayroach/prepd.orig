@@ -2,6 +2,96 @@
 
 Prepd-project is a set of Terraform Plans and Ansible Playbooks to manage Infrastructure and Project Deployments
 
+## Projects and Applications
+
+A Project consists of:
+- A group of one or more Applications known as an Application Group (AG), and
+- One or more Infrastructure Environments (IE), e.g. production, into which the AG is deployed
+
+Each IE has it's own unique definition and is logically or physically separate from the other IEs
+
+IEs and AGs are defined by blueprints
+
+
+## Prepd Virtual Machine
+
+A Prepd Virtual Machine (PVM) encapsulates a Project by providing:
+
+- blueprints that define the IEs and AGs
+- a Development IE
+- the cluster-manager for the Local IE
+
+The PVM is used to:
+
+- Spin up IEs
+- Deploy AGs into the IEs
+- Add new applications to the AG
+
+
+### Blueprints
+
+The default PVM contains blueprints for creating IEs and to deploy the AG into those IEs
+
+### IE blueprints
+
+A Prepd project has the following environments built in by default: development, local, qa, staging and production
+Each environment can be modified to provide unique infrastructure, but already work out of the box. The built in blueprints provide:
+
+#### Development
+
+The Development IE is designed to run on one or more developer machines and can also be easily provisioned and configured to run on AWS EC2.
+The developer machine IE is defined in project_root/Vagrantfile and is provisioned when running vagrant up for the first time.
+The machine will be automatically configured from the playbook `config-development.yml` the first time the machine is brought up.
+
+- To re-provision the Development IE run `vagrant destroy` followed by `vagrant up` in project_root. 
+- To re-configure the Development IE run `vagrant provision` OR in the PVM, `cd project_root/ansible && ./config-development.yml`
+
+To run development IE on EC2, do the following:
+
+- run the `tga` command in project_root/terraform/development
+- run `config-development.yml` in project_root/ansible
+
+A use case for doing this is to be able to run the application group in a development environment on a publicly accessible machine
+for testing with mobile phone clients
+
+#### Local
+
+The Local IE is defined in the same Vagrantfile and provisions a three node Docker Swarm cluster.
+The cluster runs consul and registrator containers to manage container discovery
+
+The Local IE is provisioned when running `vagrant up node[1:3]` for the first time.
+The nodes will be automatically configured from the playbook `config-local.yml` the first time the nodes are brought up.
+
+- To re-provision the IE, in project_root on the local machine run `vagrant up node[1:3]`
+- To re-configure the IE, in project_root/ansible on the PVM run `config-local.yml` 
+
+#### Staging
+
+Staging IE is defined in Terraform plans.
+
+- To provision staging IE, in project_root/terraform/staging on the PVM, run `tga`
+- To configure staging IE, in project_root/ansible on the PVM, run `config-staging.yml`
+
+#### Production
+
+Production IE is defined in Terraform plans.
+
+
+### AG blueprints
+
+Prepd projects ship with a 'default' Application Group
+AG blueprints are defined as Ansible playbooks
+
+
+## Application Groups
+
+For example, a Shopping Cart micro service is a project consisting of a backend application (Cart API) and a frontend application (Cart App)
+
+Each application is its own git repository. An application can be of any language, may or may not require a database, etc
+
+
+# Using
+
 ## Clone Existing Project
 - git clone the existing project
 - copy product credentials to the project_root (see below)
@@ -64,98 +154,33 @@ The developer uses ssh-agent forwarding to access the machine from the VM
 - credentials are *never* stored in a repo including in an encrypted vault
 
 
-## Using
+# Default infrastructure
 
-- Initialize the VM (the provisioner will automatically setup the machine for development)
-
-```bash
-vagrant up
-```
-
-
-## Description
-
-### Infrastructure
-
-Terraform plan manages all the AWS infrastructure
-
-### Configuration
-which when combined with these
-[Ansible roles](https://github.com/rjayroach/ansible-roles/) provides a set of infrastructure blueprints
-for development, staging and production in which to deploy a project with one or more applications
-
-The blueprints provide a stand-alone provisioning system based on Ansible, however
-when they are managed with the Prepd gem, project and application setup becomes fully automated.
-
-Regardless of whether Prepd is used to manage the blueprints, Ansible playbooks are the primary tool used to
-provision the infrastructure across four specific environments: local, devleopment, staging and production
-
-
-### Default infrastructure
+## Development
 
 The Vagrantfile (for local) and the Ansible playbooks (for all other environments) provision a Default Infrastructure
 which creates a 3 node cluster with basic serivces
 
 - node0: This is the primary machine for development and management of cluster services
-- node1-3: These are cluster nodes
 
-node0 can run without other nodes
-
-
-## Roles
-
-### Dev
-
-This includes only node0 in the 'dev' role
-
-- node0: a 'master' machine for development, testing, building images, load balancing and managing a docker swarm cluster
-
-### Cluster
-
-This includes node0 in the 'master' role
+## Local
 
 - node0: Consul Server, Registrator, Nginx (ELB)
 - node1: Consul, Registrator, Postgresql (RDS)
 - node2: Consul, Registrator, Redis (Elasticache)
 - node3: Consul, Registrator, DynamoDB
 
-## Environments
 
-### Local and Development
+# Default Application Group
 
-Local (vagrant) and Development (AWS) have common functionality in that they can both implement either 'dev' or 'dev' and 'cluster' roles
-When just using the 'dev' role then it is a single machine with the applications and the supporting services, e.g. PG, Redis, etc.
+Prepd includes a Default Application Group. It includes the following files:
 
-However, when the 'cluster' role is applied a docker swarm network is created to emulate a cluster running on cloud (AWS) resources in production
-
-
-### Staging and Production
-
-This assumes that supporting services may be installed using AWS (RDS, Elasticache, etc) or as services installed directly on EC2s or as docker
-containers
-
-
-## Supporting Services
-
-Can be updated in run/docker-compose.yml
-TODO: List consul DNS names where the above services are reachable
-
-### Project Infrastructure
-
-Project is defined in run/docker-compose.override.yml See [docker](https://docs.docker.com/compose/extends/)
-- Rails container exposing HTTP via Puma (default)
-- Rails container override CMD to run Resque
-- Rails container override CMD to run Scheduler
-- Ember app
-
-
-## Installing
-
-```bash
-git clone git@github.com:rjayroach/prepd-project.git
-cd prepd-project/ansible
-git submodule add git@github.com:rjayroach/ansible-roles roles
-```
+- default.yml  Settings for the Group, e.g. git repos, databases and a dictionary merge of inventory group vars and encrypted vars
+- default-utils.yml  A playbook that defines common tasks, e.g. backing up and transfering a database from one IE to another
+- default-development.yml  Configures the applications in the development IE
+- default-local.yml  Installs the application into the local cluster
+- default-staging.yml  Install the application into the staging cluster
+- default-production.yml  Install the application into the production cluster
 
 ## Variables
 
@@ -172,9 +197,8 @@ Variables are stored in either plain text files (vars.yml) or encrypted files (v
 Examples:
 - vars that apply to the local environment are located in `inventory/group_vars/local/vars.yml`
 - encrypted vars that apply to all environemnts are located in `inventory/group_vars/all/vault`
-- vars that apply to dev (local and development) are set in `inventory/group_vars/development/vars.yml`
 
-Source code repositories and other dev related info is stored inventory/group_vars/dev/vars.yml
+Source code repositories and other develoment related info is stored default.yml
 
 ### Encrypted Variables
 
@@ -188,26 +212,17 @@ ansible-vault edit inventory/group_vars/all/vault
 ```
 
 ### Variables in Playbooks
-Application variables, both plain text and encrypted, are merged together into a single dictionary hash name `app_vars`.
-Each application has a key under `app_vars` defined in the app-vars.yml file.
-The template generated by prepd contains keys for two applications: 'cool_app_1' and 'cool_app_2'.
-If there is only one application then remove references to 'cool_app_2' and change the name 'cool_app_1'
-to the application name.
-This needs to be done in each of the inventory/group_vars/environment/vars.yml and vault files.
+
+Application variables, both plain text and encrypted, are merged together into a single dictionary hash name in default.yml
+Each application has a key defined in the default.yml file.
+The template generated by prepd contains keys for two applications: 'default_api' and 'default_app'.
 
 
-## Using
+# Utils
 
-### Connect to local machine
+## Database Backup and Restore
 
-```bash
-vagrant up
-vagrant ssh node0 OR ssh -4 -A vagrant@node0.{project_name}.local
-cd {project_name}/ansible
-./dev.yml # run the role configuration manually (this is automatically run when the machine is first created by Ansible)
-```
-
-### Database Backup and Restore
+TODO: Update these instructions
 
 ```bash
 cd ansible

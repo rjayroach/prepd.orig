@@ -1,13 +1,8 @@
 ---
 machine_env:
-  productione: en_US.UTF-8
+  locale: en_US.UTF-8
   timezone: 'Asia/Singapore'
-env_vars:
-  cool_app_1:
-    domain: domain.production
-    envs:
-      ENV_VAR: 'plain text var for machines in the production group'
-  cool_app_2:
-    domain: domain.production
-    envs:
-      ENV_VAR: 'plain text var for machines in the production group'
+default_api:
+  DATABASE_HOST: 'localhost'
+default_app:
+  API_HOST: 'loclahost:3000'

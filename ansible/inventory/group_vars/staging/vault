@@ -1,8 +1,5 @@
 ---
-env_vault:
-  cool_app_1:
-    envs:
-      ENV_VAULT_VAR: 'find me in inventory/group_vars/staging/vault'
-  cool_app_2:
-    envs:
-      ENV_VAULT_VAR: 'find me in inventory/group_vars/staging/vault'
+default_app_vault:
+  ENV_VAULT_VAR: 'find me in inventory/group_vars/staging/vault'
+default_api_vault:
+  ENV_VAULT_VAR: 'find me in inventory/group_vars/staging/vault'
