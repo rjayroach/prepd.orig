@@ -3,8 +3,9 @@
 .id_rsa*
 .terraform-vars.txt
 .vault-password.txt
-ansible/inventory/ec2.*
-terraform.tfstate*
 .vagrant/
+.DS_Store
+ansible/inventory/ec2.*
 data/*
 !data/.keep
+terraform.tfstate*
