@@ -53,7 +53,7 @@ Vagrant.configure(2) do |config|
     # Configuration
     node0.vm.provision :ansible_local do |ansible|
       ansible.install = false
-      ansible.playbook = 'dev.yml'
+      ansible.playbook = 'config-development.yml'
       ansible.provisioning_path = "/home/vagrant/#{project_name}/ansible"
       ansible.inventory_path = 'inventory/hosts'
     end
@@ -81,7 +81,7 @@ Vagrant.configure(2) do |config|
       # Configuration
       node.vm.provision :ansible_local do |ansible|
         ansible.install = false
-        ansible.playbook = 'cluster.yml'
+        ansible.playbook = 'config-local.yml'
         ansible.provisioning_path = "/home/vagrant/#{project_name}/ansible"
         ansible.inventory_path = 'inventory/hosts'
         ansible.limit = "node#{i}.local"
