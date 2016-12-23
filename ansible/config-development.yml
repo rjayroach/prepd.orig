@@ -3,15 +3,14 @@
 ---
 - hosts: development
 
-  pre_tasks:
-    - include_vars: '../.developer.yml'
+  vars_files: ['../.developer.yml']
 
   roles:
     - common
     - yadr
     - developer
     - developer-tools
-    - { role: ruby, ruby_version: 2.3.3 }
+    - { role: ruby, version: 2.3.3 }
     - ember
     - postgres
     - c2p4-dev

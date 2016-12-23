@@ -6,12 +6,12 @@
 
   roles:
     - ember
-    #- { role: ruby, version: '{{ ruby_version }}' }
+    - { role: ruby, version: '{{ ruby_version }}' }
     # - { role: node, node_version: 2.3.3 }
     - { role: git, repos: '{{ git_repos }}' }
-    #- { role: env, apps: '{{ env_apps }}' }
-    #- { role: postgres-utils, action: 'create-databases', postgres_databases: '{{ databases }}' }
-    # - redis
-    #- { role: rails, apps: '{{ rails_apps }}' }
+    - { role: env, apps: '{{ env_apps }}' }
+    - { role: postgres-utils, action: 'create-databases', postgres_databases: '{{ databases }}' }
+    - redis
+    - { role: rails, apps: '{{ rails_apps }}' }
     - { role: ember, apps: '{{ ember_apps }}' }
     - { role: tmuxinator, files: '{{ tmuxinator_files }}' }

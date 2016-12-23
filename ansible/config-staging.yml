@@ -14,3 +14,34 @@
 
   tasks:
     - debug: msg='cluster-node:&staging'
+
+    - name: Run Consul container
+    # NOTE: these service were copy/pasted here to build on later; they dont' currently work
+      docker_service:
+        project_name: discovery
+        definition:
+          redis:
+            image: redis:latest
+            network_mode: host
+            ports:
+              - '6379:6379'
+
+          rabbitmq:
+            image: rabbitmq:latest
+            network_mode: host
+
+          postgres:
+            image: postgres:lastest
+            network_mode: host
+            env_file:
+              - ../env/app
+
+          dynamodb:
+            image: tutum/dynamodb:latest
+            network_mode: host
+            ports:
+              - '8000:8000'
+
+          elk:
+            image: sebp/elk:latest # https://hub.docker.com/r/sebp/elk/
+            network_mode: host

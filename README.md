@@ -68,7 +68,7 @@ The Development IE is designed to run on one or more developer machines and can 
 The developer machine IE is defined in project_root/Vagrantfile and is provisioned when running vagrant up for the first time.
 The machine will be automatically configured from the playbook `config-development.yml` the first time the machine is brought up.
 
-- To re-provision the Development IE run `vagrant destroy` followed by `vagrant up` in project_root. 
+- To re-provision the Development IE run `vagrant destroy` followed by `vagrant up` in project_root.
 - To re-configure the Development IE run `vagrant provision` OR in the PVM, `cd project_root/ansible && ./config-development.yml`
 
 To run development IE on EC2, do the following:
@@ -88,7 +88,7 @@ The Local IE is provisioned when running `vagrant up node[1:3]` for the first ti
 The nodes will be automatically configured from the playbook `config-local.yml` the first time the nodes are brought up.
 
 - To re-provision the IE, in project_root on the local machine run `vagrant up node[1:3]`
-- To re-configure the IE, in project_root/ansible on the PVM run `config-local.yml` 
+- To re-configure the IE, in project_root/ansible on the PVM run `config-local.yml`
 
 #### Staging
 

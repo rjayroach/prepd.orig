@@ -8,8 +8,8 @@ default_api_envs: '{{ default_api_all_vault | combine(default_api_all) | combine
 default_app_envs: '{{ default_app_all_vault | combine(default_app_all) | combine(default_app_vault) | combine(default_app) }}'
 
 databases:
-  - { name: 'default_api_development', password: '{{ default_api_envs.DATABASE_PASSWORD }}' }
-  - { name: 'default_api_test', password: '{{ default_api_envs.DATABASE_PASSWORD }}' }
+  - { name: '{{ default_api_envs.DATABASE_NAME }}', password: '{{ default_api_envs.DATABASE_PASSWORD }}' }
+  - { name: '{{ default_api_envs.DATABASE_TEST }}', password: '{{ default_api_envs.DATABASE_PASSWORD }}' }
 
 env_apps:
   - { dir: '{{ project_dir }}/default-api', envs: '{{ default_api_envs }}' }
@@ -17,8 +17,8 @@ env_apps:
 
 git_account: 'git@github.com:maxcole'
 git_repos:
-  - { name: '{{ git_account }}/default-api', dir: '{{ project_dir }}' }
-  - { name: '{{ git_account }}/default-app', dir: '{{ project_dir }}' }
+  - { account: '{{ git_account }}', name: 'default-api', dir: '{{ project_dir }}' }
+  - { account: '{{ git_account }}', name: 'default-app', dir: '{{ project_dir }}' }
 
 ember_apps:
   - { name: 'default-app', dir: '{{ project_dir }}' }

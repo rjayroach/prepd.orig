@@ -14,7 +14,8 @@ tag_Environment_development
 
 
 [tag_Environment_local]
-node[0:3].local ansible_user=vagrant
+# NOTE: if node0 is included in local then the application envs will be from group_vars/local/vars.yml
+node[1:3].local ansible_user=vagrant
 
 [local:children]
 tag_Environment_local
