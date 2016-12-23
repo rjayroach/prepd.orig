@@ -1,6 +1,31 @@
 # Prepd-project
 
-Prepd-project is a set of Terraform Plans and Ansible Playbooks to manage Infrastructure and Project Deployments
+This repository creates a Virutal Machine that consists of:
+
+- A development environment based on the latest Debian distribution
+- A set of Terraform Plans to provision infrastructure
+- A group of Ansible Playbooks to configure the Infrastructure and deploy the relevant projects
+
+# Quick Start
+
+## Clone an Existing Project
+
+- Use git to clone this repository
+- Use the prepd gem to [copy product credentials](https://github.com/rjayroach/prepd#transfer-credentials-to-new-machine)
+- Boot the Development Environment
+
+```bash
+vagrant up
+```
+
+OR
+
+## Create a New Project
+
+View the [prepd README.md](https://github.com/rjayroach/prepd)
+
+
+# Overview
 
 ## Projects and Applications
 
@@ -88,18 +113,6 @@ AG blueprints are defined as Ansible playbooks
 For example, a Shopping Cart micro service is a project consisting of a backend application (Cart API) and a frontend application (Cart App)
 
 Each application is its own git repository. An application can be of any language, may or may not require a database, etc
-
-
-# Using
-
-## Clone Existing Project
-
-- git clone the existing project
-- copy product credentials from [here](https://github.com/rjayroach/prepd#transfer-credentials-to-new-machine)
-
-## Create a New Project
-
-View the [prepd README.md](https://github.com/rjayroach/prepd)
 
 
 # Default infrastructure
