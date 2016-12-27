@@ -34,18 +34,18 @@ tag_Environment_production
 
 
 ### Roles
-[tag_Role_cluster_manager]
+[tag_Role_manager]
 node0.local
 
-[cluster-manager:children]
-tag_Role_cluster_manager
+[manager:children]
+tag_Role_manager
 
 
-[tag_Role_cluster_node]
+[tag_Role_worker]
 node[1:3].local
 
-[cluster-node:children]
-tag_Role_cluster_node
+[worker:children]
+tag_Role_worker
 
 
 
