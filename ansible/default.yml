@@ -30,3 +30,6 @@ rails_apps:
 
 tmuxinator_files:
   - { name: 'default.yml', src: '{{ project_dir }}/default-api/.tmuxinator.yml' }
+
+tmuxinator_projects:
+  - default

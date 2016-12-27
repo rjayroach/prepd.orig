@@ -13,11 +13,11 @@
     - { role: ruby, version: 2.3.3 }
     - ember
     - postgres
-    - c2p4-dev
 
 
 - hosts: development:&local
 
   roles:
     - prepd
+    - prepd-tools
     - terraform

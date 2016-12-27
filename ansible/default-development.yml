@@ -14,4 +14,4 @@
     - redis
     - { role: rails, apps: '{{ rails_apps }}' }
     - { role: ember, apps: '{{ ember_apps }}' }
-    - { role: tmuxinator, files: '{{ tmuxinator_files }}' }
+    - { role: tmuxinator, projects: '{{ tmuxinator_projects }}' }
