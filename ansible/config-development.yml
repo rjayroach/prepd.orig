@@ -1,5 +1,4 @@
 #!/usr/bin/env ansible-playbook
-# NOTE: This playbook installs dependenices for application development AND infrastructure management
 ---
 - hosts: development
 
@@ -15,7 +14,9 @@
     - postgres
 
 
-- hosts: development:&local
+# This play intentionally only installs these roles onto the PVM
+# It will NOT install these roles onto an AWS VM with the development tag
+- hosts: node0.local
 
   roles:
     - prepd
