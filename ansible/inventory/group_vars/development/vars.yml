@@ -2,8 +2,11 @@
 ---
 machine_env:
   locale: en_US.UTF-8
-  timezone: 'Asia/Singapore'
+  timezone: 'UTC'
+
 default_api:
   DATABASE_HOST: 'localhost'
+  INFRASTRUCTURE_ENV: development
+
 default_app:
   API_HOST: 'loclahost:3000'
