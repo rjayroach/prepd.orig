@@ -90,7 +90,8 @@ ember deploy:list staging
 
 ## Access the application
 
-http://<app-name>.staging.<domain>
+
+http://{app-name}.staging.{domain}
 
 
 ## NOTEs
