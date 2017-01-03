@@ -90,7 +90,7 @@ ember deploy:list staging
 
 ## Access the application
 
-http://recheck.staging.rhodesedge.com
+http://<app-name>.staging.<domain>
 
 
 ## NOTEs
