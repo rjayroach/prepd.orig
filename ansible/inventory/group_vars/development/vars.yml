@@ -9,4 +9,4 @@ default_api:
   INFRASTRUCTURE_ENV: development
 
 default_app:
-  API_HOST: 'loclahost:3000'
+  API_HOST: 'localhost:3000'
