@@ -26,9 +26,9 @@ Installing ember-cli-deploy creates config/deploy.js
 ## Create S3 bucket for deployment
 
 - Documented here: https://github.com/ember-cli-deploy/ember-cli-deploy-s3#minimum-s3-permissions
-- Permissions need to be set on the bucket (this is done automatically via Terraform)
-- Note that the bucket-name in the permissions file needs to match the value of `ember_app_bucket` (this is also done automatically via Terraform)
-- The bucket name is defined in a Terraform var (currently as `ember_app_bucket`)
+- Permissions need to be set on the bucket (done automatically by Terraform)
+- The bucket name is defined in a Terraform var (currently as `${var.application}.staging.${var.domain}`)
+- Note that the bucket-name in the permissions file needs to match the value of `${var.application}.staging.${var.domain}` (done automatically by Terraform)
 
 
 ## Configure deployment
@@ -63,13 +63,7 @@ module.exports = function(deployTarget) {
 - Package everything in project_root/dists which is then ready to be deployed
 
 ```bash
-ember build deploy
-```
-
-- Is the next step necessary? What does it do?
-
-```bash
-ember deploy build
+ember build deploy  # this command can be skipped as ember deploy also does the build
 ```
 
 - Deploy to staging
@@ -78,18 +72,27 @@ ember deploy build
 ember deploy staging
 ```
 
-OR invoke alias:
+- List staging deployments
 
 ```bash
-ebds
+ember deploy:list staging
 ```
 
-ember build deploy; ember deploy staging
+- Activate application on staging
 
-ember deploy:list staging
+```bash
+ember deploy:activate staging --rev <the hash of the build>
+```
+
+OR use aliases:
+
+```bash
+eds         # ember deploy staging
+edls        # ember deploy:list staging
+edas <hash> # ember deploy:activate staging --rev <hash>
+```
 
 ## Access the application
-
 
 http://{app-name}.staging.{domain}
 
