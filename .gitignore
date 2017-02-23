@@ -1,6 +1,7 @@
 .boto
 .developer.yml
 .id_rsa*
+.prepd.yml
 .terraform-vars.txt
 .vault-password.txt
 .vagrant/

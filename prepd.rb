@@ -22,9 +22,9 @@ module Prepd
     end
 
     def configure
-      return unless File.exist?('prepd.yml')
+      return unless File.exist?('.prepd.yml')
       require 'yaml'
-      prepd_conf = YAML.load_file('prepd.yml')
+      prepd_conf = YAML.load_file('.prepd.yml')
       prepd_conf.each { |k, v| send("#{k}=", v) }
     end
 
