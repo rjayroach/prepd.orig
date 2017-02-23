@@ -3,6 +3,5 @@ include = {
 }
 
 dependencies = {
-  paths = ["../vpc"]
-  # , "../mysql", "../redis"]
+  paths = ["../vpc", "../data"]
 }

@@ -5,7 +5,7 @@
 .vault-password.txt
 .vagrant/
 .DS_Store
-ansible/inventory/ec2.*
-data/*
+/data/
 !data/.keep
-terraform.tfstate*
+.terraform/
+terraform.tfvars

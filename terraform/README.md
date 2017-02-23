@@ -1,8 +1,17 @@
 # Terraform
 
-Used to provision AWS resources for development, staging and production Infrastructure Environments
+
+Used to provision AWS resources primarily for staging and production Infrastructure Environments and occasionally for development
 
 Terraform Templates (tf) define the infraststructure
+
+
+## One Time Configuration
+
+After creating the project then:
+
+- a bucket name for state must be created. It must be globally unique within the AWS infrastructure
+
 
 ## State
 
@@ -13,13 +22,28 @@ It then compares the actual state with the known state (tfstate) and updates the
 
 State is stored remotely on an encrypted S3 bucket
 
+## Using
+
+You must run terraform in a directory which has templates in it. It does not search sub-directories
+Every directory that has terraform templates will store it's state in hidden files in that directory
+
+Each directory reads its own .terragrunt file so to avoid duplication we use a top level .terragrunt file and reference it from the sub-directory using
+
+  find_in_parent_folders()
+
+This helper method returns the path to the first .terragrunt file it finds in the parent folders above the current .terragrunt file
+See: https://github.com/gruntwork-io/terragrunt#find_in_parent_folders-helper
+
+In addition, this top level file needs to write state information to the correct sub-directory. It gets that information using
+
+  path_relative_to_include()
+
+This helper returns the relative path to the top level .terragrunt file and the path specified in its include block
+See https://github.com/gruntwork-io/terragrunt#path_relative_to_include-helper
 
 
+## Configuration
+There is a global .terragrunt file
+It configures Terraform to automatically store tfstate files in S3
 
-## EC2 Key Pair
-- Terraform does not create key pairs and can only upload an existing key pair
-- key pairs in AWS are stored by region so it makes sense to generate a key pair on the localhost and upload the key_material to AWS as necessary per region
-- Terraform is the single tool to manage infrastructure so it must upload the key pair
-- Ansible is the single tool to configure instances so it needs the key pair in order to access and configure them
-- only prepd or manual transfer is what creates and/or gives access to credentials
-- credentials are *never* stored in a repo including in an encrypted vault
+bucket_name must be in ~/.terraform-vars.txt and in ~/prepd/terraform/.terragrunt
