@@ -13,9 +13,12 @@ module Prepd
     def create
       STDOUT.puts '### Running prepd'
       configure
-      # setup_git
-      # clone_submodules
-      # commit_git
+      setup_git
+      clone_submodules
+      commit_git
+      copy_developer_yml
+      generate_credentials
+      encrypt_vault_files
     end
 
     def configure
@@ -130,7 +133,7 @@ module Prepd
     def encrypt_vault_files
       Dir.chdir("#{path}/ansible") do
         %w(all development local production staging).each do |env|
-          system("ansible-vault encrypt inventory/group_vars/#{env}/vault")
+          system("ansible-vault encrypt group_vars/#{env}/vault")
         end
       end
     end
