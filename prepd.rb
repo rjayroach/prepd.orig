@@ -15,10 +15,10 @@ module Prepd
       configure
       setup_git
       clone_submodules
-      commit_git
       copy_developer_yml
       generate_credentials
       encrypt_vault_files
+      commit_git
     end
 
     def configure
@@ -116,7 +116,11 @@ module Prepd
     # Generate a key pair to be used as the EC2 key pair
     #
     def generate_ssh_keys(file_name = '.id_rsa')
-      Dir.chdir(path) { system("ssh-keygen -b 2048 -t rsa -f #{file_name} -q -N '' -C 'ansible@#{name}.#{client.name}.local'") }
+      Dir.chdir(path) { system("ssh-keygen -b 2048 -t rsa -f #{file_name} -q -N '' -C 'ansible@#{host_name}.local'") }
+    end
+
+    def host_name
+      Dir.pwd.split('/').pop(2).reverse.join('.')
     end
 
     #
