@@ -1,0 +1,29 @@
+---
+- hosts: xmaster:&docker
+  vars_files: ['../../.developer.yml', 'application.yml']
+
+  tasks:
+    - name: Create data directory
+      file:
+        path: '{{ item }}'
+        state: directory
+      with_items:
+        - /home/admin/data
+        - /home/admin/data/xfer/clients/abc
+        - /home/admin/data/xfer/vendors/xyz
+
+    - name: Copy product files to server
+      copy:
+        src: '/home/vagrant/prepd/data/default/{{ item }}'
+        dest: '/home/admin/data/{{ item }}'
+      with_items:
+        - state.csv
+        - some/path/to/file.ext
+
+
+    # TODO: This will need to be broken up b/c in staging it will use RDS, not a PG container
+- hosts: master:&docker
+  vars_files: ['../../.developer.yml', 'application.yml']
+  tasks:
+
+    - include: container.yml image_tag='develop'

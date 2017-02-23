@@ -1,0 +1,14 @@
+# group_vars/all/vars.yml
+---
+### 'config-*' variables
+cluster_type: none
+master_mode: developer
+
+tf_remote_state_bucket: com-example-terraform-state
+
+### 'application-*' variables
+# application name comes from ~/prepd/ansible/<application_name>/applictation.yml
+# NOTE: These variables can only be used in playbooks which include <application_name>/application.yml
+application_dir: '{{ ansible_env.HOME }}/{{ application_name }}'
+prepd_name: '{{ playbook_dir.split("/")[0:-1] | last }}'
+data_dir: '{{ ansible_env.HOME }}/{{ prepd_name }}/data/{{ application_name }}'

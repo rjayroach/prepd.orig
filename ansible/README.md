@@ -1,26 +1,80 @@
 # Using
 
-## Adding a new Application to the Application Group
+## Envrionments
 
-Applications are defined using Ansible Playbooks
+There are four: development, local, staging and production
+
+Local is based on VirtualBox VMs managed with Vagrant and are 1 master node and 3 nodes for the cluster
+The other environments are expected to be in the cloud.
+
+Machines are configured in each environment using one or both of these playbooks:
+
+- config-master.yml: Sets up the master node in the environment, .e.g developer tools in 'local' and 'developement' envs
+- config-cluster.yml: Sets up the cluster in the specific environment
+
+Specify the environment against which the playbook is run by specifying the -i switch when invoking the playbook
+The default environment is 'local'
+
+
+### Variables
+
+group_vars/environment/vars.yml
+
+- cluster_type: none, docker, docker-swarm, kubernetes
+- master: developer, developer_and_provisioner
+
+These variables determine what type of cluster is setup when you run config-cluster.yml
+
+## Roles
+
+There are roles for the cluster: etcd, master and node
+
+
+## Application Groups
+
+Application Groups are defined in Ansible Playbooks. The following files comprise a Group:
+
+### In ~/prepd/ansible/application-name:
+
+- application.yml: values that define git repos, rails, ember, etc, db and ENV vars for setting up on a developer machine
+- container.yml: similar to a docker-compose.yml that defines the container and dependent containers
+- docker.yml: tasks that launch the application as a docker container (on a host or docker swarm)
+- kubernetes.yml: tasks that launch the application into a kubernetes cluster
+
+### In ~/group_vars/all/application-name:
+
+### In ~/prepd/ansible:
+
+- application-name-cluster.yml: includes the
+- application-name-master.yml
 
 In the Developer IE, add the following files in ~/project_name/ansible:
 
 - Create the application installation settings
 
 
-# Notes
+### Setup Application for Development
 
-## Services and source code
-
-file: config-development.yml
+file: config-master.yml
 
 This playbook:
-- installs the application's service dependencies on local machine
+- installs the application source code, service dependencies and configures db, envs, etc on local machine
 - pulls the application sources from a repository
 - initializes the application(s)
 
-## Ansible Roles
+
+1. Configure Application Vars
+- group_vars/all/project-name.yml: these are ENV values for the application
+
+2. Configure application
+- application-name/application.yml:
+- install language tools, e.g. Ruby, Node, etc
+- pull down the git project(s)
+- run bundle and migrations
+- run any other project config stuff, e.g. tmuxinator link files, etc.
+
+
+## Notes on Ansible Roles
 
 1. common
 - install packages common across all servers, e.g. tcpdump, tmux
@@ -31,100 +85,3 @@ This playbook:
 
 3. developer
 - configure developer specific settings, e.g. git and docker credentials
-
-## Setup Project for Development
-
-1. Configure Project Vars
-- inventory/group_vars/dev/vars.yml: project vars for GH, docker, etc
-
-### Development Environment
-
-Provision Infrastructure on VMs on Laptop
-
-1. Instantiate VirtualBox Hosts
-- dev.yml - brings up the VM hosts and installs basic packages
-- install ansible
-- install docker
-
-2. Bring up a docker swarm cluster 
-- cluster.yml: requires ansible to get the IP address
-
-3. Configure Project Infrastructure
-- app-development.yml: installs the project's supporting services, e.g. Postgres and Redis, directly onto the VMs and configures root pwd, etc
-
-OR
-- swarm-services.yml: install the project's supporting services defined in docker-compose-services.yml into the cluster and configures root pwd, etc
-- docker-compose-services.yml: defines the project's supporting services, e.g. Postgres and Redis
-
-
-### Production Cloud Install (TODO)
-
-Provision Infrastructure on AWS
-
-1. Instantiate EC2 Hosts and Other AWS Infra, e.g. RDS, Elasticache
-- Terraform: Provision and configure the project's serivces in the cloud; configure root pwd, etc
-
-2. Bring up a docker swarm cluster 
-- swarm-cluster.yml: installs a docker cluster onto the EC2s
-
-
-## Project Lifecycle
-
-### Development
-
-1. Configure Project Services
-- project-services.yml: Whether local or cloud, create the project's databases, configure redis, rabbitmq, etc
-
-2. Setup Project Master
-- project.yml:
-- install language tools, e.g. Ruby, Node, etc
-- pull down the git project(s)
-- run bundle and migrations
-- run any other project config stuff, e.g. tmuxinator link files, etc.
-
-
-### Testing
-
-1. docker-compose.yml 
-- deploys all the application services into the cluter
-
-2. docker-compose-test.yml
-- overrides each application container's command to run Rspec tests rather than the ususal web server
-
-3. CI Server (?)
-
-### Production
-
-
-
-## Master
-
-# See: [https://docs.docker.com/swarm/install-manual/#/step-6-communicate-with-the-swarm]
-
-Setup Consul and Swarm Manager on Master
-
-```bash
-docker run -d -p 8500:8500 --net=host --name=consul progrium/consul --bind 10.100.199.200 -server -bootstrap
-docker run -d -p 4000:4000 swarm manage -H :4000 --replication --advertise 10.100.199.200:4000 consul://10.100.199.200:8500
-```
-
-Setup Swarm Manager on Node1
-
-```bash
-node1 'docker run -d -p 4000:4000 swarm manage -H :4000 --replication --advertise 10.100.199.201:4000 consul://10.100.199.200:8500'
-```
-
-Setup Swarm Nodes on Nodes 2 & 3
-
-```bash
-node2 'docker run -d swarm join --advertise=10.100.199.202:2375 consul://10.100.199.200:8500'
-node2 'docker run -d --name=registrator --net=host --volume=/var/run/docker.sock:/tmp/docker.sock gliderlabs/registrator:latest -ip 10.100.199:202 consul://10.100.199.200:8500'
-node3 'docker run -d swarm join --advertise=10.100.199.203:2375 consul://10.100.199.200:8500'
-node3 'docker run -d --name=registrator --net=host --volume=/var/run/docker.sock:/tmp/docker.sock gliderlabs/registrator:latest -ip 10.100.199:203 consul://10.100.199.200:8500'
-```
-
-Run Redis on Cluster
-
-```bash
-docker -H :4000 run --name some-redis -d redis                                                                                                                                                                            [ruby-2.1.5p273]
-```

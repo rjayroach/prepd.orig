@@ -1,0 +1,8 @@
+#!/usr/bin/env ansible-playbook
+# This playbook will deploy the application into the cluster_type of the specific environment
+# For now that is either kubernetes or docker
+# TODO: perhaps this could be abstracted to a generic application-deploy.yml passing in the application name as a var
+---
+- include: config/cluster.yml
+- include: default/kubernetes.yml
+- include: default/docker.yml

@@ -1,3 +1,15 @@
+# TODO: prepd is a directory in prepd-project that can be invoked with cli as well
+
+def invoke_prepd?
+  ARGV[0].eql?('up') and File.exist?('prepd.rb') and not Dir.exist?('ansible/roles')
+end
+
+if invoke_prepd?
+  require_relative 'prepd'
+  project = Prepd::Project.new
+  project.create
+end
+
 Vagrant.configure(2) do |config|
   host_name = Dir.pwd.split('/').pop(2).reverse.join('.')
   project_name = 'prepd'
@@ -23,45 +35,9 @@ Vagrant.configure(2) do |config|
   config.hostmanager.manage_guest = true
   config.hostmanager.ignore_private_ip = false
 
-  config.vm.define :node0, primary: true do |node0|
-    node0.vm.provider :virtualbox do |v|
-      v.name = "node0.#{host_name}.local"
-    end
-
-    node0.vm.synced_folder '.', '/vagrant', disabled: true
-    node0.vm.synced_folder '.', "/home/vagrant/#{project_name}"
-
-    # Networking
-    node0.vm.network 'private_network', type: :dhcp
-    node0.vm.hostname = "node0.#{host_name}.local"
-    node0.hostmanager.aliases = ["node0.local"]
-    node0.hostmanager.ip_resolver = proc do |vm, resolving_vm|
-      if hostname = (vm.ssh_info && vm.ssh_info[:host])
-        `vagrant ssh -c "/sbin/ifconfig eth1" | grep "inet addr" | tail -n 1 | egrep -o "[0-9\.]+" | head -n 1 2>&1`.split("\n").first[/(\d+\.\d+\.\d+\.\d+)/, 1]
-      end
-    end
-
-    # Port Forwarding
-    node0.vm.network 'forwarded_port', guest: 2375, host: 2375, auto_correct: true    # docker
-    node0.vm.network 'forwarded_port', guest: 2376, host: 2376, auto_correct: true    # docker
-    node0.vm.network 'forwarded_port', guest: 3000, host: 3000, auto_correct: true    # rails
-    node0.vm.network 'forwarded_port', guest: 4200, host: 4200, auto_correct: true    # ember
-    node0.vm.network 'forwarded_port', guest: 7357, host: 7357, auto_correct: true    #
-    node0.vm.network 'forwarded_port', guest: 35729, host: 35729, auto_correct: true  # reload
-    node0.vm.network 'forwarded_port', guest: 49152, host: 49152, auto_correct: true  # reload
-
-    # Configuration
-    node0.vm.provision :ansible_local do |ansible|
-      ansible.install = false
-      ansible.playbook = 'config-development.yml'
-      ansible.provisioning_path = "/home/vagrant/#{project_name}/ansible"
-      ansible.inventory_path = 'inventory/hosts'
-      ansible.limit = "node0.local"
-    end
-  end
-
-  (1..3).each do |i|
-    config.vm.define "node#{i}", autostart: false do |node|
+  (0..3).each do |i|
+    master = autostart = forward_ports = i.eql?(0)
+    config.vm.define "node#{i}", autostart: autostart do |node|
       node.vm.provider :virtualbox do |v|
         v.name = "node#{i}.#{host_name}.local"
       end
@@ -79,12 +55,23 @@ Vagrant.configure(2) do |config|
         end
       end
 
+      # Port Forwarding
+      if forward_ports
+        node.vm.network 'forwarded_port', guest: 2375, host: 2375, auto_correct: true    # docker
+        node.vm.network 'forwarded_port', guest: 2376, host: 2376, auto_correct: true    # docker
+        node.vm.network 'forwarded_port', guest: 3000, host: 3000, auto_correct: true    # rails
+        node.vm.network 'forwarded_port', guest: 4200, host: 4200, auto_correct: true    # ember
+        node.vm.network 'forwarded_port', guest: 7357, host: 7357, auto_correct: true    #
+        # node.vm.network 'forwarded_port', guest: 35729, host: 35729, auto_correct: true  # reload
+        node.vm.network 'forwarded_port', guest: 49152, host: 49152, auto_correct: true  # live-reload
+      end
+
       # Configuration
       node.vm.provision :ansible_local do |ansible|
         ansible.install = false
-        ansible.playbook = 'config-local.yml'
+        ansible.playbook = master ? 'config-master.yml' : 'config-cluster.yml'
         ansible.provisioning_path = "/home/vagrant/#{project_name}/ansible"
-        ansible.inventory_path = 'inventory/hosts'
+        ansible.inventory_path = 'inventory/local'
         ansible.limit = "node#{i}.local"
       end
     end

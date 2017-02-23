@@ -1,0 +1,16 @@
+### Environment
+[local]
+node[0:3].local ansible_user=vagrant
+
+### Roles
+[tag_Role_master]
+node0.local
+
+[tag_Role_etcd]
+node1.local
+
+[tag_Role_controller]
+node1.local
+
+[tag_Role_worker]
+node[2:3].local

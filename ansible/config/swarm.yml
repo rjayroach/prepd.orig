@@ -1,0 +1,22 @@
+#!/usr/bin/env ansible-playbook
+# NOTE: DEPRECATED
+# This configures an 'old school' cluster by installing a docker swarm cluster (not swarm-mode)
+# It uses Consul for service discovery and Registrator to notify Consul of new containers available in the cluster
+# It is still here for testing cluster installation modes when booting a local cluster with Vagrant
+---
+- hosts: master:&swarm
+
+  roles:
+    - { role: consul-registrator, node_role: 'master' }
+
+
+- hosts: master:controller:&swarm
+
+  roles:
+    - { role: consul-registrator, node_role: 'manager' }
+
+
+- hosts: worker:&swarm
+
+  roles:
+    - { role: consul-registrator, node_role: 'worker' }

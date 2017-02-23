@@ -1,0 +1,18 @@
+### Dynamic Environments
+[tag_Environment_production]
+# alwasy include localhost so we can run playbooks against this inventory and apply the appropriate group_vars
+terraformer ansible_host=localhost ansible_connection=local
+# NOTE: Option to manually add an AWS EC2 instance to this env
+# production.exmaple.com ansible_ssh_host=54.122.xxx.xxx ansible_user=ubuntu
+
+[production:children]
+tag_Environment_production
+
+[bastion]
+192.168.0.1
+
+[app-servers]
+10.0.1.118
+
+[app-servers:vars]
+ansible_ssh_common_args='-o ProxyCommand="ssh -W %h:%p -q admin@192.168.0.1"'

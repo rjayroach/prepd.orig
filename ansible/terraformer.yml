@@ -1,0 +1,86 @@
+#!/usr/bin/env ansible-playbook
+# NOTE: This is a work in progress
+# The purpose of this playbook is to take values from ansible group_vars and write them as input vars
+# for terraform templates
+---
+- hosts: terraformer
+  tasks:
+    - name: Add tfvars to all templates in the current environment and global
+      blockinfile:
+        create: yes
+        dest: '~/prepd/terraform/{{item}}/terraform.tfvars'
+        marker: '# {mark} ANSIBLE MANAGED BLOCK (all)'
+        block: |
+          tf_remote_state_bucket = "{{tf_remote_state_bucket}}"
+      with_items:
+        - '{{infrastructure_env}}/vpc'
+        - '{{infrastructure_env}}/default-app'
+        - '{{infrastructure_env}}/default-web'
+        - global/iam
+
+    # NOTE: This tasks writes to global (non-environment based) so is repeated whether local, staging, etc
+    - name: Add tfvars to global/iam
+      blockinfile:
+        create: yes
+        dest: '~/prepd/terraform/global/iam/terraform.tfvars'
+        marker: '# {mark} ANSIBLE MANAGED BLOCK (iam)'
+        block: |
+          certificate_name        = "star_example_com"
+          certificate_body_file   = "/home/vagrant/prepd/data/cert/star.example.com/star.example.com.crt"
+          private_key_file        = "/home/vagrant/prepd/data/cert/server_key.pem"
+          certificate_chain_file  = "/home/vagrant/prepd/data/cert/star.example.com/star.example.com.ca-bundle"
+
+    - name: Add tfvars to all templates in the current environment
+      blockinfile:
+        create: yes
+        dest: '~/prepd/terraform/{{item}}/terraform.tfvars'
+        marker: '# {mark} ANSIBLE MANAGED BLOCK (all-1)'
+        block: |
+          environment = "{{infrastructure_env}}"
+          region = "{{tf_aws_region}}"
+          ansible_vars_dir = "{{ansible_env.HOME}}/group_vars/{{infrastructure_env}}"
+      with_items:
+        - '{{infrastructure_env}}/vpc'
+        - '{{infrastructure_env}}/default-app'
+        - '{{infrastructure_env}}/default-web'
+
+    - name: Add tfvars to the app-server template in the current environment
+      blockinfile:
+        create: yes
+        dest: '~/prepd/terraform/{{infrastructure_env}}/default-app/terraform.tfvars'
+        marker: '# {mark} ANSIBLE MANAGED BLOCK (app)'
+        block: |
+          application = "default"
+          hostname = "default-api-{{infrastructure_env}}.example.com"
+          instance_type = "m4.large"
+          public_key = "{{ansible_env.HOME}}/.ssh/id_rsa.pub"
+
+    - name: Add tfvars to the vpc template in the current environment
+      blockinfile:
+        create: yes
+        dest: '~/prepd/terraform/{{infrastructure_env}}/vpc/terraform.tfvars'
+        marker: '# {mark} ANSIBLE MANAGED BLOCK (vpc)'
+        block: |
+          domain = "example.com"
+
+
+- hosts: terraformer:&staging
+  tasks:
+    - uri:
+        url: http://checkip.amazonaws.com/
+        return_content: yes
+      register: current_ip
+    - set_fact:
+        bastion_cidr: "{{current_ip.content | replace('\n', '/32')}}"
+    - name: Add tfvars to all the web application template in the current environment
+      blockinfile:
+        create: yes
+        dest: '~/prepd/terraform/{{item}}/terraform.tfvars'
+        marker: '# {mark} ANSIBLE MANAGED BLOCK (bastion)'
+        #  bastion_host_permit_ip = ["{{bastion_cidr}}"]
+        block: |
+          website_allowed_hosts = "{{bastion_cidr}}"
+          bucket_name = "{{default_web_envs.AWS_BUCKET}}"
+          credentials_file = "/home/vagrant/default/default-web/.env.deploy.{{infrastructure_env}}"
+      with_items:
+        - '{{infrastructure_env}}/default-web'

@@ -1,0 +1,21 @@
+---
+- hosts: master:&kubernetes
+
+  roles:
+    - { role: kubernetes-master, mode: 'install' }
+
+
+- hosts: controller:&kubernetes
+
+  roles:
+    - common
+    - { role: etcd, mode: 'install' }
+    - { role: kubernetes-controller, mode: 'install' }
+
+
+- hosts: worker:&kubernetes
+
+  roles:
+    - common
+    - docker
+    - { role: kubernetes-worker, mode: 'install' }

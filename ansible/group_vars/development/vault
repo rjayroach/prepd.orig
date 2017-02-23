@@ -1,0 +1,8 @@
+# group_vars/development/vault
+---
+default_api_vault:
+  ENV_VAULT_VAR: 'find me in group_vars/development/vault'
+  DATABASE_PASSWORD: 'vagrant'
+default_app_vault:
+  ENV_VAULT_VAR: 'find me in group_vars/development/vault'
+  API_HOST: 'localhost:3000'

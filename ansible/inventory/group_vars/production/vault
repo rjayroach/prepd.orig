@@ -1,6 +1,0 @@
-# inventory/group_vars/production/vault
----
-default_app_vault:
-  ENV_VAULT_VAR: 'find me in inventory/group_vars/production/vault'
-default_api_vault:
-  ENV_VAULT_VAR: 'find me in inventory/group_vars/production/vault'

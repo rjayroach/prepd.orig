@@ -1,7 +1,0 @@
-# inventory/group_vars/all/vars.yml
----
-default_api_all:
-  DATABASE_TEST: default_api_test
-
-default_app_all:
-  ALL_VAR: default-app-value

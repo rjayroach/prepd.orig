@@ -1,0 +1,31 @@
+#!/usr/bin/env ansible-playbook
+---
+- hosts: master
+  name: Set master_mode from var
+  tasks:
+    - debug: var=master_mode
+    - group_by: key={{ master_mode }}
+
+- hosts: developer:developer_and_provisioner
+
+  vars_files: ['../.developer.yml']
+
+  roles:
+    - common
+    - yadr
+    - developer
+    - developer-tools
+    - git
+    #- docker
+    - { role: ruby, version: 2.3.0 }
+    #- ember
+    - postgres
+
+
+- hosts: developer_and_provisioner
+
+  roles:
+    # - prepd
+    # - prepd-tools
+    # - terraform
+    #- { role: k8s/kops, kops_modes: [install, configure] }
