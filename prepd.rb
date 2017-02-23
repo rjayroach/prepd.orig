@@ -119,10 +119,6 @@ module Prepd
       Dir.chdir(path) { system("ssh-keygen -b 2048 -t rsa -f #{file_name} -q -N '' -C 'ansible@#{host_name}.local'") }
     end
 
-    def host_name
-      Dir.pwd.split('/').pop(2).reverse.join('.')
-    end
-
     #
     # Generate the key to encrypt ansible-vault files
     #
@@ -192,7 +188,11 @@ module Prepd
 
     def archive(type = :credentials)
       t_path = type.eql?(:credentials) ? data_path : path
-      "#{t_path}/#{client.name}-#{name}-#{type}.tar"
+      "#{t_path}/#{host_name('-')}-#{type}.tar"
+    end
+
+    def host_name(delimiter = '.')
+      Dir.pwd.split('/').pop(2).reverse.join(delimiter)
     end
 
     def data_path
