@@ -11,6 +11,7 @@ This repository creates a Virutal Machine that consists of:
 ## Clone an Existing Project
 
 - Use git to clone this repository
+- Pull the git submodules: `git submodule update --init --recursive`
 - Use the prepd gem to [copy product credentials](https://github.com/rjayroach/prepd#transfer-credentials-to-new-machine)
 - Boot the Development Environment
 

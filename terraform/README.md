@@ -1,6 +1,20 @@
 # Terraform
 
-Used to provision AWS resources primarily for staging and production Infrastructure Environments and occasionally for development as well
+Used to provision AWS resources for development, staging and production Infrastructure Environments
+
+Terraform Templates (tf) define the infraststructure
+
+## State
+
+Terraform State (tfstate) is stored in hidden sub-directories of the directory in which you run the templates
+
+State is necessary because on each run terraform will query AWS for the current state of the resource defined in the template.
+It then compares the actual state with the known state (tfstate) and updates the Infrastructure based on the difference
+
+State is stored remotely on an encrypted S3 bucket
+
+
+
 
 ## EC2 Key Pair
 - Terraform does not create key pairs and can only upload an existing key pair
