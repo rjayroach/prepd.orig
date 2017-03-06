@@ -1,13 +1,15 @@
 # TODO: prepd is a directory in prepd-project that can be invoked with cli as well
 
 def invoke_prepd?
-  ARGV[0].eql?('up') and File.exist?('prepd.rb') and not Dir.exist?('ansible/roles')
+  ARGV[0].eql?('up') and File.exist?('prepd.rb')
 end
 
 if invoke_prepd?
   require_relative 'prepd'
   project = Prepd::Project.new
-  project.create
+  project.create if not Dir.exist?('ansible/roles')
+  project.clone_submodules if not Dir.exist?('ansible/roles/prepd')
+  project.copy_developer_yml
 end
 
 Vagrant.configure(2) do |config|

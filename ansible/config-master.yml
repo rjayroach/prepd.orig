@@ -1,13 +1,6 @@
 #!/usr/bin/env ansible-playbook
 ---
-- hosts: master
-  name: Set master_mode from var
-  tasks:
-    - debug: var=master_mode
-    - group_by: key={{ master_mode }}
-
-- hosts: developer:developer_and_provisioner
-
+- hosts: master:&local
   vars_files: ['../.developer.yml']
 
   roles:
@@ -16,16 +9,16 @@
     - developer
     - developer-tools
     - git
-    #- docker
-    - { role: ruby, version: 2.3.0 }
-    #- ember
-    - postgres
+    - prepd
+    - prepd-tools
 
 
-- hosts: developer_and_provisioner
+# NOTE: This could be used to configure k8s if it needs commnds run on remote host
+#       For now it is just installing docker on staging server to run the recheck docker container
+- hosts: master:!local
+
+  vars_files: ['../.developer.yml']
 
   roles:
-    # - prepd
-    # - prepd-tools
-    # - terraform
-    #- { role: k8s/kops, kops_modes: [install, configure] }
+    - common
+    - docker
