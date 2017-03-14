@@ -1,19 +1,36 @@
 #!/usr/bin/env ansible-playbook
 ---
-- hosts: master
+# Sets up the local machine for application development
+- hosts: master:&local
 
-  vars_files: ['../.developer.yml', 'default/application.yml']
+  vars_files: ['../.developer.yml']
 
   roles:
-    - postgres
-    - redis
-    #- { role: circleci, projects: '{{ circleci_projects }}' }
-    #- ember
-    # - { role: node, node_version: 2.3.3 }
-    - { role: ruby, version: '{{ ruby_version }}' }
-    - { role: git-repos, repos: '{{ git_repos }}' }
-    - { role: env, apps: '{{ env_apps }}' }
-    - { role: postgres-utils, action: 'create-databases', postgres_databases: '{{ databases }}' }
-    - { role: rails, apps: '{{ rails_apps }}' }
-    #- { role: ember, apps: '{{ ember_apps }}' }
-    - { role: tmuxinator, files: '{{ tmuxinator_files }}' }
+    - default/dev
+
+
+# Runs docker commands on a remote host to bring up application container(s)
+- hosts: provisioner:&development
+
+  vars_files: ['../.developer.yml']
+
+  roles:
+    - default/docker
+
+
+# Run the application in a Kubernetes Cluster
+- hosts: master:&staging
+
+  vars_files: ['../.developer.yml']
+
+  roles:
+    - default/kubernetes
+
+
+# Run the application in a Kubernetes Cluster
+- hosts: master:&production
+
+  vars_files: ['../.developer.yml']
+
+  roles:
+    - default/kubernetes
