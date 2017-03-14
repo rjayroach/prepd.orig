@@ -1,0 +1,67 @@
+#!/usr/bin/env ansible-playbook
+# This playbook generates tfvars for a Pod which is deployed into two or more environments
+# it takes values from ansible group_vars and writes them as input vars to terraform templates
+# NOTE: If a common var becomes env specific just move it to the appropriate block
+# TODO: All values should be substitutable otherwise the file is not portable (see domain value in first block)
+#       Not sure if this is way forward. If yes, then this becomes a generic playbook (good), but not customizable (bad)
+---
+- hosts: provisioner
+
+  vars_files: ['../.developer.yml', 'default/application.yml']
+
+  tasks:
+    - name: Add common vars (in each environment) to pod.tfvars
+      blockinfile:
+        create: yes
+        dest: '{{ tf_dir }}/{{ infrastructure_env }}/{{ application_name }}/pod.tfvars'
+        marker: '# {mark} ANSIBLE MANAGED BLOCK (pod)'
+        block: |
+          application = "{{ application_name }}"
+          domain = "{{ hostvars[inventory_hostname][application_name + '_envs']['tf_domain'] }}"
+          public_key = "{{ ssh_dir }}/id_rsa.pub"
+
+    - name: Add environment specific vars to env.tfvars
+      blockinfile:
+        create: yes
+        dest: '{{ tf_dir }}/{{ infrastructure_env }}/{{ application_name }}/env.tfvars'
+        marker: '# {mark} ANSIBLE MANAGED BLOCK (env)'
+        block: |
+          ansible_vars_dir = "{{ playbook_dir }}/group_vars/{{ infrastructure_env }}"
+          aws_region = "{{ default_envs.tf_aws_region }}"
+          bucket_name = "{{ default_app_envs.APP_HOST }}"
+          credentials_file = "{{ application_dir }}/default-app/.env.deploy.{{ infrastructure_env }}"
+          environment = "{{ infrastructure_env }}"
+          hostname = "{{ default_app_envs.API_HOST }}"
+          instance_type = "{{ default_envs.tf_instance_type }}"
+
+
+- hosts: provisioner:&staging
+  vars_files: ['../.developer.yml', 'default/application.yml']
+  tasks:
+    - uri:
+        url: http://checkip.amazonaws.com/
+        return_content: yes
+      register: current_ip
+    - set_fact:
+        bastion_cidr: "{{current_ip.content | replace('\n', '/32')}}"
+    - name: Generate environment specific tfvars for pod
+      blockinfile:
+        create: yes
+        dest: '{{ tf_dir }}/{{ infrastructure_env }}/{{ application_name }}/env.tfvars'
+        marker: '# {mark} ANSIBLE MANAGED BLOCK (bastion)'
+        block: |
+          website_allowed_hosts = "{{ bastion_cidr }}"
+
+
+- hosts: provisioner:&production
+  vars_files: ['../.developer.yml', 'default/application.yml']
+  tasks:
+    - set_fact:
+        bastion_cidr: "the ip of the office"
+    - name: Add an IP range that is allowed to access the S3 bucket in this envrionment
+      blockinfile:
+        create: yes
+        dest: '{{ tf_dir }}/{{ infrastructure_env }}/{{ application_name }}/terraform.tfvars'
+        marker: '# {mark} ANSIBLE MANAGED BLOCK (bastion)'
+        block: |
+          website_allowed_hosts = "{{ bastion_cidr }}"

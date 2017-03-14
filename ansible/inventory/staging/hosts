@@ -7,3 +7,6 @@ terraformer ansible_host=localhost ansible_connection=local
 
 [staging:children]
 tag_Environment_staging
+
+[staging:vars]
+infrastructure_env=staging

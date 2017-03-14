@@ -5,3 +5,6 @@ terraformer ansible_host=localhost ansible_connection=local
 
 [development:children]
 tag_Environment_development
+
+[development:vars]
+infrastructure_env=development

@@ -2,6 +2,28 @@
 # Plain text settings can all be in this one file b/c they're not sensitive
 # Vault settings are in group_vars vault files by infrastructure_env
 ---
+# default
+default_all:
+  tf_aws_region: us-east-1
+  tf_domain: example.com
+  tf_instance_type: t2.small
+
+default_development:
+  tf_instance_type: t2.medium
+
+default_local:
+
+default_staging:
+  tf_instance_type: t2.large
+
+default_production:
+  tf_instance_type: t2.xlarge
+
+default: "{{ hostvars[inventory_hostname]['default_' + infrastructure_env] }}"
+default_envs: '{{ default_all | combine(default) }}'
+# default_envs: '{{ default_all_vault | combine(default_all) | combine(default_vault) | combine(default) }}'
+
+
 ### default_api
 default_api_all:
   DATABASE_TEST: default_api_test

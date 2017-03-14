@@ -1,0 +1,28 @@
+# group_vars/all/config.yml
+---
+config_all:
+  cluster_type: none
+  tf_remote_state_bucket: com-example-terraform-state
+  tf_remote_state_region: us-east-1
+  machine_env:
+    locale: en_US.UTF-8
+    timezone: 'Asia/Singapore'
+
+config_development:
+
+config_local:
+  cluster_type: kubernetes
+  # used in kubernetes-master/templates/openssl.cnf.j2
+  kubernetes:
+    subdomain: sub
+    domain: example
+    tld: local
+
+config_staging:
+  cluster_type: docker
+
+config_production:
+
+config: "{{ hostvars[inventory_hostname]['config_' + infrastructure_env] }}"
+config_envs: '{{ config_all | combine(config) }}'
+# config_envs: '{{ config_all_vault | combine(config_all) | combine(config_vault) | combine(config) }}'

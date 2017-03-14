@@ -2,6 +2,9 @@
 [local]
 node[0:3].local ansible_user=vagrant
 
+[local:vars]
+infrastructure_env=local
+
 ### Roles
 [tag_Role_master]
 node0.local

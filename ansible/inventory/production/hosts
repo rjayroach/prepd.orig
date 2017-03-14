@@ -8,6 +8,9 @@ terraformer ansible_host=localhost ansible_connection=local
 [production:children]
 tag_Environment_production
 
+[production:vars]
+infrastructure_env=production
+
 [bastion]
 192.168.0.1
 

@@ -4,7 +4,7 @@
   vars_files: ['../.developer.yml']
 
   roles:
-    - common
+    - { role: common, machine_env: '{{ config_envs.machine_env }}' }
     - yadr
     - developer
     - developer-tools
@@ -20,5 +20,5 @@
   vars_files: ['../.developer.yml']
 
   roles:
-    - common
+    - { role: common, machine_env: '{{ config_envs.machine_env }}' }
     - docker
