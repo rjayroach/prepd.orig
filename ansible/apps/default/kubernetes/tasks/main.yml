@@ -3,6 +3,4 @@
 # - ~/.kube/config will have multiple clusters, e.g. staging0, etc
 # TODO: playbook uses command: kubectl to deploy the container into the cluster, setting the kubectl cluster name first
 ---
-- hosts: master:&kubernetes
-  tasks:
-    - debug: var=cluster_type
+- debug: var=config.cluster_type
