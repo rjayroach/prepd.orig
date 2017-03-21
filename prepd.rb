@@ -62,13 +62,15 @@ module Prepd
     # Copy developer credentials or create them if the file doesn't already exists
     #
     def copy_developer_yml
-      return if File.exists?(".developer.yml")
-      File.open('.developer.yml', 'w') do |f|
-        f.puts('---')
-        f.puts("git_username: #{`git config --get user.name`.chomp}")
-        f.puts("git_email: #{`git config --get user.email`.chomp}")
-        f.puts("docker_username: ")
-        f.puts("docker_password: ")
+      Dir.chdir(creds_path) do
+        return if File.exists?("developer.yml")
+        File.open('developer.yml', 'w') do |f|
+          f.puts('---')
+          f.puts("git_username: #{`git config --get user.name`.chomp}")
+          f.puts("git_email: #{`git config --get user.email`.chomp}")
+          f.puts("docker_username: ")
+          f.puts("docker_password: ")
+        end
       end
     end
 
@@ -89,8 +91,9 @@ module Prepd
         STDOUT.puts 'tf_key and tf_secret need to be set (or set tf_creds to path to CSV file)'
         return
       end
-      Dir.chdir(path) do
-        File.open('.terraform-vars.txt', 'w') do |f|
+      Dir.chdir(creds_path) do
+        FileUtils.mkdir_p 'terraform'
+        File.open('terraform/default.tfvars', 'w') do |f|
           f.puts("aws_access_key_id = \"#{tf_key}\"")
           f.puts("aws_secret_access_key = \"#{tf_secret}\"")
         end
@@ -103,9 +106,9 @@ module Prepd
         STDOUT.puts 'ansible_key and ansible_secret need to be set (or set ansible_creds to path to CSV file)'
         return
       end
-      Dir.chdir(path) do
-        File.open('.boto', 'w') do |f|
-          f.puts('[Credentials]')
+      Dir.chdir(creds_path) do
+        File.open('boto', 'w') do |f|
+          f.puts('[profile default]')
           f.puts("aws_access_key_id = #{ansible_key}")
           f.puts("aws_secret_access_key = #{ansible_secret}")
         end
@@ -115,16 +118,16 @@ module Prepd
     #
     # Generate a key pair to be used as the EC2 key pair
     #
-    def generate_ssh_keys(file_name = '.id_rsa')
-      Dir.chdir(path) { system("ssh-keygen -b 2048 -t rsa -f #{file_name} -q -N '' -C 'ansible@#{host_name}.local'") }
+    def generate_ssh_keys(file_name = 'id_rsa')
+      Dir.chdir(creds_path) { system("ssh-keygen -b 2048 -t rsa -f #{file_name} -q -N '' -C 'ansible@#{host_name}.local'") }
     end
 
     #
     # Generate the key to encrypt ansible-vault files
     #
-    def generate_vault_password(file_name = '.vault-password.txt')
+    def generate_vault_password(file_name = 'vault-password.txt')
       require 'securerandom'
-      Dir.chdir(path) { File.open(file_name, 'w') { |f| f.puts(SecureRandom.uuid) } }
+      Dir.chdir(creds_path) { File.open(file_name, 'w') { |f| f.puts(SecureRandom.uuid) } }
     end
 
     #
@@ -182,8 +185,8 @@ module Prepd
     end
 
     def file_list(mode)
-      return ".boto .id_rsa .id_rsa.pub .terraform-vars.txt .vault-password.txt" if mode.eql?(:all)
-      ".vault-password.txt"
+      return "boto id_rsa id_rsa.pub terraform/default.tfvars vault-password.txt" if mode.eql?(:all)
+      "vault-password.txt"
     end
 
     def archive(type = :credentials)
@@ -197,6 +200,10 @@ module Prepd
 
     def data_path
       "#{path}/data"
+    end
+
+    def creds_path
+      "#{data_path}/creds_path"
     end
 
     def path
