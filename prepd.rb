@@ -203,7 +203,7 @@ module Prepd
     end
 
     def creds_path
-      "#{data_path}/creds_path"
+      "#{data_path}/credentials"
     end
 
     def path
