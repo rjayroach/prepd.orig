@@ -56,8 +56,8 @@ default_api_staging:
   SFTP_KEY: /data/sftp_id_rsa
 
 default_api: "{{ hostvars[inventory_hostname]['default_api_' + infrastructure_env] }}"
-default_api_envs: '{{ default_api_all_vault | combine(default_api_all) | combine(default_api_vault) | combine(default_api) }}'
-
+default_api_prov: "{{ hostvars[inventory_hostname]['recheck_api_' + infrastructure_env + '_prov'] | default({}) }}"
+default_api_envs: '{{ default_api_all_vault | combine(default_api_all) | combine(default_api_vault) | combine(default_api) | combine(default_api_prov) }}'
 
 ### default_web
 default_web_all:

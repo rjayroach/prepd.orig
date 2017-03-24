@@ -1,193 +1,335 @@
-# Prepd-project
+# Prepd
 
-This repository creates a Virutal Machine that consists of:
+Prepd - A Production Ready Environment for Project Development
 
-- A development environment based on the latest Debian distribution
-- A set of Terraform Plans to provision infrastructure
-- A group of Ansible Playbooks to configure the Infrastructure and deploy the relevant projects
+One of the core principles of Agile Development is delivering viewable results
+to the business from Week 1. Too often product developement begins with the
+application software, while the infrastructure to deploy into is addressed as
+and when it is needed.
 
-# Quick Start
+Thankfully, many web application products get to market on similar,
+if not identical, infrastructure. However setting up this infastructure takes time,
+is error prone and typically is non-repeatable ending up as a unique snowflake.
 
-## Clone an Existing Project
+To avoid this, many development teams turn to a PaaS service such as Heroku.
+This has limitations and only addresses the final deployment infrastructure.
 
-- Use git to clone this repository
-- Pull the git submodules: `git submodule update --init --recursive`
-- Use the prepd gem to [copy product credentials](https://github.com/rjayroach/prepd#transfer-credentials-to-new-machine)
-- Boot the Development Environment
+Prepd aims to address this by providing a 'convention over configruation' approach
+to provisioning infrastructure. From local developer machines (vagrant running linux
+on the developer's laptop) to staging and production running a docker swarm cluster.
+
+With microservices becoming a common application development strategy, prepd
+aims to make it dead simple to build and deploy a microservice based application.
+Beginning with the end in mind, Prepd offers a simple, conventional way to provision
+all this infrastructure, including CI workflow, secrets managment, 12-factor apps
+
+Agile Development requires 'near production' infrastructure to be in place from Day 1.
+Using Prepd, makes that possible quickly and easily without resorting to a PaaS provider.
+
+## Focus
+
+The focus of Prepd is on enabling developers to build and deploy applications following current
+industry best practices with as little effort as possible. Being flexible and configurable
+for the wide variety of application deployment strategies is currently a secondary goal to
+getting something up and running. Therefore, choices are made:
+
+1. Infrastructure is provisioned via:
+..* Vagrantfile on local machines for development and a local cluster
+..* Terraform plans for clutser infrastructure exclusively on AWS
+2. Ansible is the automation tool used to configure the infrastructure for application deployment
+3. Docker conatainer deployment is currently the only method for deploying applications
+4. The development environment currently supports:
+..* Postgres and Redis for data storage
+..* Rails and Ember for application development
+
+A future goal for Prepd is to enable more application types and tool support
+
+# What is a Production Ready Environment?
+
+It takes a lot of services tuned to work together to make smoothly running infrastructure
+
+## Networking
+- Domain names figured out and DNS running on Route53 etc
+- Ability to programatically change and update DNS
+- SSL certs are already installed so we do TLS from the beginning on all publicly available infrastructure
+- Load Balancing is setup, configured and running in at least staging and production, but also possible in development
+
+## Development Pipeline Required Services
+
+Prepd provisions and configures the infrastructure and provides a tool to deploy applications into the infrastructure.
+However, certain aspects of the pipeline are expected to be provided outside of Prepd, which are:
+
+- Continuous Integration
+- Container Build and Store
+
+### Continuous Integration
+
+CI is expected to be setup and configured as part of an automated deploy process from the outset of the project.
+Here is an example overview of using CircleCI to test a Rails API application
+
+- Create an account on CircleCI and link it to your GitHub account. Authorize CircleCI to access the account
+- Add the Rails API repository as a project on CircleCI. If using rails-templates a circle.yml project already exists
+- Configure slack notifications for when a build completes
+
+### Container Build and Store
+
+A container repository that also builds containers is expected to be provided.
+Here is an example overview of using quay.io to build a Rails API application container
+
+- Create an account on quay.io and link it to your GitHub account. Authorize quay.io to access the account
+- Add the Rails API repository as a docker repository on quay.io
+- Create a trigger to build the container when there is a push on a certain branch of the GitHub repository
+
+Prepd provides ansible playbooks that invoke docker compose to deploy the container from quay.io to the target infrastructure
+
+## Application Services (TODO)
+
+Prepd will be augmented to provide playbooks for the default Application Group as well as Terraform plans that provide:
+
+- Communication Services, e.g. SMTP, SNS (Push), Slack webhooks, Twilio, etc
+- Logging in both local/development and in staging/production with ELK
+- Monitoring/alert service (Prometheus)
+- Additional common 3rd party services as needed
+
+## Swarm Load Balancing
+- network overlays
+- load balancing between micro services
+- manage cluster scaling with compose/swarm mode/ansible or some combination thereof
+
+
+# Installation
+
+Prepd is a ruby gem. It also requires software on the local laptop, including VirtualBox, Vagrant and Ansible
 
 ```bash
+gem install prepd
+```
+
+## Automated Installation of Dependencies (TODO)
+
+With the gem installed, navigate to it's directory and run bootstrap.sh to install dependencies
+
+```bash
+bundle cd prepd
+./bootstrap.sh
+```
+
+This will:
+
+- Install ansible
+- Clone the ansible-roles repository
+- Run ansible to install Virtualbox and Vagrant
+
+## Manual Installation of Dependencies
+
+### Ansible
+
+Tested with version 2.2.0
+
+#### Install on MacOS
+
+If planning to install on a clean machine:
+1. Wipe Mac: http://support.apple.com/kb/PH13871  OR http://support.apple.com/en-us/HT201376
+2. Create New User with Admin rights
+
+Install Homebrew:
+
+```bash
+ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+```
+
+Install python with zlib and ssl support
+
+```bash
+xcode-select --install
+brew install openssl
+brew link openssl --force
+brew uninstall python
+brew install python --with-brewed-openssl
+sudo easy_install pip
+sudo pip install -U ansible
+sudo pip install -U setuptools cryptography markupsafe
+sudo pip install -U ansible boto
+```
+
+#### Install on Ubuntu
+
+```bash
+apt-get install ansible
+```
+
+### VirtualBox
+
+Install VirtualBox from [here](https://www.virtualbox.org/wiki/Downloads)
+
+### Vagrant
+
+Install Vagrant from [here](https://www.vagrantup.com/docs/installation/)
+
+```bash
+vagrant plugin install vagrant-vbguest      # keep your VirtualBox Guest Additions up to date
+vagrant plugin install vagrant-cachier      # caches guest packages
+vagrant plugin install vagrant-hostmanager  # updates /etc/hosts file when machines go up/down
+```
+
+#### vagrant-hostmanager
+This plugin automatically updates the host's /etc/hosts file when vagrant machines go up/down
+
+In order to do that it needs sudo password or sudo priviledges.
+To avoid being asked for the password every time the hosts file is updated,
+[enable passwordless sudo](https://github.com/devopsgroup-io/vagrant-hostmanager#passwordless-sudo)
+for the specific command that hostmanager uses to update the hosts file
+
+
+# Prepd Actors
+
+A Client may have multiples projects. Applications share common infrastructure that is defined by the Project
+
+- Client: An organization with one or more projects, e.g Acme Corp
+- Project: A definition of infrastructure provided for one or more applications
+- Application: A logical group of deployable repositories, e.g. a Rails API server and an Ember web client
+
+
+## Projects
+
+- A project is comprised of Infrastructure Environments (IE) and Application Groups (AG)
+- Infrastructure Environemnts are defined separately for each environment
+- Application Groups are deployed into one or more Infrastructure EnvironmentS
+
+## Infrastructure Environments
+
+Infrastructure is either Vagrant machines for development and local environments or EC2 instances for staging and production
+
+Local, Staging and Production Environments use a Docker swarm network to manage applicaiton groups
+
+- local: virtual machines running on laptop via vagrant whose primary purpose is application development
+- development: primary purpose is also application development, but the infrastructure is deployed in the cloud (AWS)
+- staging: a mirror of production in every way with the possible exception of reduced or part-time resources
+- production: production ;-)
+
+## Applications
+
+Applications are the content that actually gets deployed. The entire purpose of prepd is to provide a consistent
+and easy to manage infrastructure for each environment into which the application will be deployed.
+
+
+# Usage
+
+## New Client
+
+This overview assumes a complete greenfield, e.g. that no infrastructure exists, no applications exist or even 3rd
+party service have been setup. To start from zero, then:
+
+- Create a new GH Organization
+- Create an AWS Account and two IAM Groups: Administrators and ReadOnlyAdministrators
+- Create a CI Account and give it access to the GH Organization
+- Create a Docker Private Repository account and give it access to the GH Organization
+- Create the project in prepd
+
+The first four items are outside the scope of this document.
+
+```ruby
+prepd
+c = Client.create(name: 'Acme')
+```
+
+## New Project
+- create a GH repo for the project
+- create an IAM user for project_name-terraform and download the AWS credentials CSV
+- create an IAM user for project_name-ansible and download the AWS credentials CSV
+- use prepd to create the project using the repo_url and path names (tf_creds and ansible_creds) to CSV files
+
+```ruby
+c = Client.find_by(name: 'Acme')
+c.projects.new(name: 'widget', repo_url: 'git@github.com:my_git_hub_account/widget.git')
+c.tf_creds = 'Users/dude/aws/widget-terraform.csv'
+c.ansible_creds = 'Users/dude/aws/widget-ansible.csv'
+c.save
+```
+
+## New Application
+
+View the [lego README.md](https://github.com/rjayroach/lego) on creating micro serivce applications with Rails and Ember
+
+## Bring Up the Machine
+
+```ruby
+cd ~/prepd/acme/widget
 vagrant up
+vagrant ssh
 ```
 
-OR
 
-## Create a New Project
+# Credentials
 
-View the [prepd README.md](https://github.com/rjayroach/prepd)
+## Project Credentials
+Prepd will create the following credential (hidden) files in project_root:
 
+- .boto: AWS IAM credentials that give read only access to Ansible
+- .developer.yml: Developer’s git account (and other account) details
+- .terraform-vars.txt: AWS IAM credentials that give full access to CRUD AWS resources
+- .vault-password.txt: a UUID used to encrypt and decrypt ansible vault files
+- .id_rsa.pub: the public key uploaded to AWS as the primary key pair for accessing EC2 instances
+- .id_rsa: the private key
 
-# Overview
-
-## Projects and Applications
-
-A Project consists of:
-- A group of one or more Applications known as an Application Group (AG), and
-- One or more Infrastructure Environments (IE), e.g. production, into which the AG is deployed
-
-Each IE has it's own unique definition and is logically or physically separate from the other IEs
-
-IEs and AGs are defined by blueprints
+- terraform will use project_root/id_rsa.pub to upload key_material to AWS for the machine key
+- config-development.yml checks the project_root and: 1) if .boto exists link it, 2) if id_rsa and id_rsa.pub exist then link them
+- the developer can then do ssh-add which will auto load ~/.ssh/id_rsa to login or run ansible
 
 
-## Prepd Virtual Machine
+## Transfer Credentials to New Machine
 
-A Prepd Virtual Machine (PVM) encapsulates a Project by providing:
+The prepd gem can encrypt the credentials using gpg which must be installed on the host machine
 
-- blueprints that define the IEs and AGs
-- a Development IE
-- the cluster-manager for the Local IE
+The encrypted credentials are written to and read from the user's home directory so that they are not accidentally
+committed to the project repository
 
-The PVM is used to:
+### Encrypt
 
-- Spin up IEs
-- Deploy AGs into the IEs
-- Add new applications to the AG
-
-
-### Blueprints
-
-The default PVM contains blueprints for creating IEs and to deploy the AG into those IEs
-
-### IE blueprints
-
-A Prepd project has the following environments built in by default: development, local, qa, staging and production
-Each environment can be modified to provide unique infrastructure, but already work out of the box. The built in blueprints provide:
-
-#### Development
-
-The Development IE is designed to run on one or more developer machines and can also be easily provisioned and configured to run on AWS EC2.
-The developer machine IE is defined in project_root/Vagrantfile and is provisioned when running vagrant up for the first time.
-The machine will be automatically configured from the playbook `config-development.yml` the first time the machine is brought up.
-
-- To re-provision the Development IE run `vagrant destroy` followed by `vagrant up` in project_root.
-- To re-configure the Development IE run `vagrant provision` OR in the PVM, `cd project_root/ansible && ./config-development.yml`
-
-To run development IE on EC2, do the following:
-
-- run the `tga` command in project_root/terraform/development
-- run `config-development.yml` in project_root/ansible
-
-A use case for doing this is to be able to run the application group in a development environment on a publicly accessible machine
-for testing with mobile phone clients
-
-#### Local
-
-The Local IE is defined in the same Vagrantfile and provisions a three node Docker Swarm cluster.
-The cluster runs consul and registrator containers to manage container discovery
-
-The Local IE is provisioned when running `vagrant up node[1:3]` for the first time.
-The nodes will be automatically configured from the playbook `config-local.yml` the first time the nodes are brought up.
-
-- To re-provision the IE, in project_root on the local machine run `vagrant up node[1:3]`
-- To re-configure the IE, in project_root/ansible on the PVM run `config-local.yml`
-
-#### Staging
-
-Staging IE is defined in Terraform plans.
-
-- To provision staging IE, in project_root/terraform/staging on the PVM, run `tga`
-- To configure staging IE, in project_root/ansible on the PVM, run `config-staging.yml`
-
-#### Production
-
-Production IE is defined in Terraform plans.
-
-
-### AG blueprints
-
-Prepd projects ship with a 'default' Application Group
-AG blueprints are defined as Ansible playbooks
-
-
-## Application Groups
-
-For example, a Shopping Cart micro service is a project consisting of a backend application (Cart API) and a frontend application (Cart App)
-
-Each application is its own git repository. An application can be of any language, may or may not require a database, etc
-
-
-# Default infrastructure
-
-## Development
-
-The Vagrantfile (for local) and the Ansible playbooks (for all other environments) provision a Default Infrastructure
-which creates a 3 node cluster with basic serivces
-
-- node0: This is the primary machine for development and management of cluster services
-
-## Local
-
-- node0: Consul Server, Registrator, Nginx (ELB)
-- node1: Consul, Registrator, Postgresql (RDS)
-- node2: Consul, Registrator, Redis (Elasticache)
-- node3: Consul, Registrator, DynamoDB
-
-
-# Default Application Group
-
-Prepd includes a Default Application Group. It includes the following files:
-
-- default.yml  Settings for the Group, e.g. git repos, databases and a dictionary merge of inventory group vars and encrypted vars
-- default-utils.yml  A playbook that defines common tasks, e.g. backing up and transfering a database from one IE to another
-- default-development.yml  Configures the applications in the development IE
-- default-local.yml  Installs the application into the local cluster
-- default-staging.yml  Install the application into the staging cluster
-- default-production.yml  Install the application into the production cluster
-
-## Variables
-
-### Locations
-
-Variables are stored in either of two locations:
-- inventory/group_vars/all
-- inventory/group_vars/<environment>
-
-The sub-directory matches either the name of the environment, e.g. development, local, staging or production
-
-Variables are stored in either plain text files (vars.yml) or encrypted files (vault)
-
-Examples:
-- vars that apply to the local environment are located in `inventory/group_vars/local/vars.yml`
-- encrypted vars that apply to all environemnts are located in `inventory/group_vars/all/vault`
-
-Source code repositories and other develoment related info is stored default.yml
-
-### Encrypted Variables
-
-When creating a new project, prepd generates a uuid to be used as a secret passphrase for encyrypting vault files.
-This passphrase is located in project_root/.vault_pass.txt which is listed in .gitignore so it is not committed to the repository.
-Use the [ansible-vault](http://docs.ansible.com/ansible/playbooks_vault.html) command to edit an encrypted file, e.g.:
-
-```bash
-cd ansible
-ansible-vault edit inventory/group_vars/all/vault
+```ruby
+prepd
+c = Client.find_by(name: 'Acme')
+p = c.projects.find_by(name: 'widget')
+p.encrypt
 ```
 
-### Variables in Playbooks
+This will create a tar file containing the various project credentials. It will then invoke gpg to encrypt the archive.
+The credentials will be placed in the project's data directory
 
-Application variables, both plain text and encrypted, are merged together into a single dictionary hash name in default.yml
-Each application has a key defined in the default.yml file.
-The template generated by prepd contains keys for two applications: 'default_api' and 'default_app'.
+You will be prompted for a passphrase to enter twice. After doing that send the file by email or other mechanism
 
+### Decrypt
 
-# Utils
+On the target machine, use prepd to decrypt the file and place it in the correct directory
 
-## Database Backup and Restore
+- Clone the project repository
+- Place the gpg tar file in the project's data directory
+- Run prepd. It will expect to find the credentials file in the project's data directory
 
-TODO: Update these instructions
-
-```bash
-cd ansible
-./db-utils --limit node0.staging --tags dump,fetch
-./db-utils --limit node0.local --tags restore
+```ruby
+prepd
+c = Client.find_by(name: 'Acme')
+p = c.projects.find_by(name: 'widget')
+p.decrypt
 ```
+
+## Authorization
+
+If giving a developer access to the machine for development only (not terraform or ansible) then add their public key to the
+instance’s ~/.ssh/authorized_keys. The developer uses ssh-agent forwarding to access the machine from the VM
+
+
+# Development
+
+After checking out the repo, run `bin/setup` to install dependencies. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+
+To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+
+# Contributing
+
+Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/prepd. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
+
+
+# License
+
+The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).

@@ -7,7 +7,7 @@
 ---
 - hosts: provisioner
 
-  vars_files: ['../.developer.yml', 'default/application.yml']
+  vars_files: ['../data/credentials/developer.yml', 'default/application.yml']
 
   tasks:
     - name: Add common vars (in each environment) to pod.tfvars
@@ -36,7 +36,7 @@
 
 
 - hosts: provisioner:&staging
-  vars_files: ['../.developer.yml', 'default/application.yml']
+  vars_files: ['../data/credentials/developer.yml', 'default/application.yml']
   tasks:
     - uri:
         url: http://checkip.amazonaws.com/
@@ -54,7 +54,7 @@
 
 
 - hosts: provisioner:&production
-  vars_files: ['../.developer.yml', 'default/application.yml']
+  vars_files: ['../data/credentials/developer.yml', 'default/application.yml']
   tasks:
     - set_fact:
         bastion_cidr: "the ip of the office"

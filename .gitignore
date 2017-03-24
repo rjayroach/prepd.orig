@@ -1,12 +1,6 @@
-.boto
-.developer.yml
-.id_rsa*
-.prepd.yml
-.terraform-vars.txt
-.vault-password.txt
 .vagrant/
 .DS_Store
 /data/
-!data/.keep
+!data/credentials/.keep
 .terraform/
-terraform.tfvars
+*.tfvars

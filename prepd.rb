@@ -85,6 +85,17 @@ module Prepd
       generate_vault_password
     end
 
+    #
+    # By default, look for downloaded AWS credentials in CSV format in these locations
+    #
+    def tf_creds
+      @tf_creds ||= "#{creds_path}/terraform/default.csv"
+    end
+
+    def ansible_creds
+      @ansible_creds ||= "#{creds_path}/boto.csv"
+    end
+
     def generate_tf_creds
       self.tf_key, self.tf_secret = CSV.read(tf_creds).last.slice(2,2) if tf_creds
       unless tf_key and tf_secret

@@ -3,7 +3,7 @@
 # Sets up the local machine for application development
 - hosts: master:&local
 
-  vars_files: ['../.developer.yml']
+  vars_files: ['../data/credentials/developer.yml']
 
   roles:
     - default/dev
@@ -12,7 +12,7 @@
 # Runs docker commands on a remote host to bring up application container(s)
 - hosts: provisioner:&development
 
-  vars_files: ['../.developer.yml']
+  vars_files: ['../data/credentials/developer.yml']
 
   roles:
     - default/docker
@@ -21,7 +21,7 @@
 # Run the application in a Kubernetes Cluster
 - hosts: master:&staging
 
-  vars_files: ['../.developer.yml']
+  vars_files: ['../data/credentials/developer.yml']
 
   roles:
     - default/kubernetes
@@ -30,7 +30,7 @@
 # Run the application in a Kubernetes Cluster
 - hosts: master:&production
 
-  vars_files: ['../.developer.yml']
+  vars_files: ['../data/credentials/developer.yml']
 
   roles:
     - default/kubernetes
