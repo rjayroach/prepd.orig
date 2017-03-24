@@ -162,7 +162,7 @@ cd ~/projects/my-client
 vagrant ssh
 ```
 
-3. If you cloned an existing project then you need to [copy product credentials](https://github.com/rjayroach/prepd/blob/master/docs/credentials.md#decrypt) to your VM
+3. If you cloned an existing project then you need to [copy product credentials](https://github.com/rjayroach/prepd/blob/master/credentials/README.md#decrypt) to your VM
 
 
 ## Develop your Project
