@@ -101,10 +101,10 @@ Prepd will be augmented to provide playbooks for the default Application Group a
 
 ## Setup
 
-1. Prepd requires the following software on the local machine: VirtualBox, Vagrant and Ansible.
-See [this document](https://github.com/rjayroach/prepd/blob/master/docs/install-dependencies.md) for steps to install dependencies on your local machine
+1. Prepd requires VirtualBox, Vagrant and Ansible to be installed on the local machine.
+See [this document](https://github.com/rjayroach/prepd/blob/master/docs/install-dependencies.md) for steps to install those dependencies
 
-2. Create a parent directory for the organization or client in which will be created a sub-directory for the project(s)
+2. Create a parent directory for the organization or client which will have a sub-directory for the project(s)
 
 ```bash
 mkdir -p ~/projects/my-client
@@ -121,7 +121,7 @@ git clone git@github.com:rjayroach/prepd.git awesome-project
 
 ### Start on an Existing Project
 
-1. Clone the existing project into the organization directory and pull the git submodules
+Clone the existing project into the organization directory and pull the git submodules
 
 ```bash
 cd ~/projects/my-client
@@ -130,26 +130,18 @@ cd project-name
 git submodule update --init --recursive
 ```
 
-2. Install project credentials
-
-Use prepd tool to [copy product credentials](https://github.com/rjayroach/prepd/blob/master/docs/credentials.md#decrypt)
-
 
 ## Connect to the Project VM
 
-1. Start the VM
-
-The first time the machine is booted it will take several minutes to configure tooling, etc.
+Start the VM. The first time the machine is booted it will take several minutes to configure tooling, etc.
 
 ```bash
 cd awesome-project
 vagrant up
 ```
 
-2. Connect to the VM
-
+Connect to the VM.
 Before connecting, ensure you have loaded your ssh key into ssh agent so that you can access git repostories from inside the VM
-
 The VM will have a unique hostname following this nomenclature: node0.project-name.organization-name.local
 
 If you have configured ssh for connections to the .local domain then:
@@ -166,6 +158,9 @@ ssh-add
 cd ~/projects/my-client
 vagrant ssh
 ```
+
+If you cloned an existing project then you need to [copy product credentials](https://github.com/rjayroach/prepd/blob/master/docs/credentials.md#decrypt) to your VM
+
 
 ## Develop your Project
 
