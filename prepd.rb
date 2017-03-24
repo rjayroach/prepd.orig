@@ -12,7 +12,7 @@ module Prepd
     #
     def create
       STDOUT.puts '### Running prepd'
-      configure
+      # configure
       setup_git
       clone_submodules
       copy_developer_yml
@@ -21,12 +21,14 @@ module Prepd
       commit_git
     end
 
-    def configure
-      return unless File.exist?('.prepd.yml')
-      require 'yaml'
-      prepd_conf = YAML.load_file('.prepd.yml')
-      prepd_conf.each { |k, v| send("#{k}=", v) }
-    end
+    # NOTE: Re-enable this function if/when there is a need for the user to modify values
+    # before running 'vagrant up' for the first time
+    # def configure
+    #   return unless File.exist?('.prepd.yml')
+    #   require 'yaml'
+    #   prepd_conf = YAML.load_file('.prepd.yml')
+    #   prepd_conf.each { |k, v| send("#{k}=", v) }
+    # end
 
     #
     # Clone prepd-project, remove the git history and start with a clean repository
@@ -97,7 +99,7 @@ module Prepd
     end
 
     def generate_tf_creds
-      self.tf_key, self.tf_secret = CSV.read(tf_creds).last.slice(2,2) if tf_creds
+      self.tf_key, self.tf_secret = CSV.read(tf_creds).last.slice(2,2) if File.exists?(tf_creds)
       unless tf_key and tf_secret
         STDOUT.puts 'tf_key and tf_secret need to be set (or set tf_creds to path to CSV file)'
         return
@@ -112,7 +114,7 @@ module Prepd
     end
 
     def generate_ansible_creds
-      self.ansible_key, self.ansible_secret = CSV.read(ansible_creds).last.slice(2,2) if ansible_creds
+      self.ansible_key, self.ansible_secret = CSV.read(ansible_creds).last.slice(2,2) if File.exists?(ansible_creds)
       unless ansible_key and ansible_secret
         STDOUT.puts 'ansible_key and ansible_secret need to be set (or set ansible_creds to path to CSV file)'
         return

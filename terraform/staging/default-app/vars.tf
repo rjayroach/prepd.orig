@@ -1,9 +1,0 @@
-variable "aws_access_key_id" {}
-variable "aws_secret_access_key" {}
-variable "region" {}
-variable "tf_remote_state_bucket" {}
-variable "tf_remote_state_region" {}
-variable "bucket_name" {}
-variable "credentials_file" {}
-variable "environment" {}
-variable "website_allowed_hosts" {}
