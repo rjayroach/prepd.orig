@@ -44,7 +44,7 @@ getting something up and running. Therefore, choices are made:
 
 A future goal for Prepd is to enable more application types and tool support
 
-# What is a Production Ready Environment?
+# A Production Ready Environment Defined
 
 It takes a lot of services tuned to work together to make smoothly running infrastructure
 
@@ -97,222 +97,78 @@ Prepd will be augmented to provide playbooks for the default Application Group a
 - manage cluster scaling with compose/swarm mode/ansible or some combination thereof
 
 
-# Installation
+# Getting Started
 
-Prepd is a ruby gem. It also requires software on the local laptop, including VirtualBox, Vagrant and Ansible
+## Setup
 
-```bash
-gem install prepd
-```
+Prepd requires the following software on the local machine: VirtualBox, Vagrant and Ansible.
 
-## Automated Installation of Dependencies (TODO)
+1. [Install Dependencies](https://github.com/rjayroach/prepd/blob/master/docs/install-dependencies.md) on your local machine
 
-With the gem installed, navigate to it's directory and run bootstrap.sh to install dependencies
+2. Create an organization, e.g. client, directory for the project(s)
 
 ```bash
-bundle cd prepd
-./bootstrap.sh
+mkdir -p ~/projects/my-client
 ```
 
-This will:
+### Start a New Project
 
-- Install ansible
-- Clone the ansible-roles repository
-- Run ansible to install Virtualbox and Vagrant
-
-## Manual Installation of Dependencies
-
-### Ansible
-
-Tested with version 2.2.0
-
-#### Install on MacOS
-
-If planning to install on a clean machine:
-1. Wipe Mac: http://support.apple.com/kb/PH13871  OR http://support.apple.com/en-us/HT201376
-2. Create New User with Admin rights
-
-Install Homebrew:
+Clone this repository into the organization directory
 
 ```bash
-ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+cd ~/projects/my-client
+git clone git@github.com:rjayroach/prepd.git awesome-project
 ```
 
-Install python with zlib and ssl support
+### Start with an Existing Project
+
+1. Clone the existing project and pull the git submodules
 
 ```bash
-xcode-select --install
-brew install openssl
-brew link openssl --force
-brew uninstall python
-brew install python --with-brewed-openssl
-sudo easy_install pip
-sudo pip install -U ansible
-sudo pip install -U setuptools cryptography markupsafe
-sudo pip install -U ansible boto
+cd ~/projects/my-client
+git clone project-url
+cd project-name
+git submodule update --init --recursive
 ```
 
-#### Install on Ubuntu
+2. Install project credentials
+
+Use prepd tool to [copy product credentials](https://github.com/rjayroach/prepd/blob/master/docs/credentials.md)
+
+
+## Connect to Project VM
+
+1. Start the VM
+
+The first time the machine is booted it will take several minutes to configure tooling, etc.
 
 ```bash
-apt-get install ansible
-```
-
-### VirtualBox
-
-Install VirtualBox from [here](https://www.virtualbox.org/wiki/Downloads)
-
-### Vagrant
-
-Install Vagrant from [here](https://www.vagrantup.com/docs/installation/)
-
-```bash
-vagrant plugin install vagrant-vbguest      # keep your VirtualBox Guest Additions up to date
-vagrant plugin install vagrant-cachier      # caches guest packages
-vagrant plugin install vagrant-hostmanager  # updates /etc/hosts file when machines go up/down
-```
-
-#### vagrant-hostmanager
-This plugin automatically updates the host's /etc/hosts file when vagrant machines go up/down
-
-In order to do that it needs sudo password or sudo priviledges.
-To avoid being asked for the password every time the hosts file is updated,
-[enable passwordless sudo](https://github.com/devopsgroup-io/vagrant-hostmanager#passwordless-sudo)
-for the specific command that hostmanager uses to update the hosts file
-
-
-# Prepd Actors
-
-A Client may have multiples projects. Applications share common infrastructure that is defined by the Project
-
-- Client: An organization with one or more projects, e.g Acme Corp
-- Project: A definition of infrastructure provided for one or more applications
-- Application: A logical group of deployable repositories, e.g. a Rails API server and an Ember web client
-
-
-## Projects
-
-- A project is comprised of Infrastructure Environments (IE) and Application Groups (AG)
-- Infrastructure Environemnts are defined separately for each environment
-- Application Groups are deployed into one or more Infrastructure EnvironmentS
-
-## Infrastructure Environments
-
-Infrastructure is either Vagrant machines for development and local environments or EC2 instances for staging and production
-
-Local, Staging and Production Environments use a Docker swarm network to manage applicaiton groups
-
-- local: virtual machines running on laptop via vagrant whose primary purpose is application development
-- development: primary purpose is also application development, but the infrastructure is deployed in the cloud (AWS)
-- staging: a mirror of production in every way with the possible exception of reduced or part-time resources
-- production: production ;-)
-
-## Applications
-
-Applications are the content that actually gets deployed. The entire purpose of prepd is to provide a consistent
-and easy to manage infrastructure for each environment into which the application will be deployed.
-
-
-# Usage
-
-## New Client
-
-This overview assumes a complete greenfield, e.g. that no infrastructure exists, no applications exist or even 3rd
-party service have been setup. To start from zero, then:
-
-- Create a new GH Organization
-- Create an AWS Account and two IAM Groups: Administrators and ReadOnlyAdministrators
-- Create a CI Account and give it access to the GH Organization
-- Create a Docker Private Repository account and give it access to the GH Organization
-- Create the project in prepd
-
-The first four items are outside the scope of this document.
-
-```ruby
-prepd
-c = Client.create(name: 'Acme')
-```
-
-## New Project
-- create a GH repo for the project
-- create an IAM user for project_name-terraform and download the AWS credentials CSV
-- create an IAM user for project_name-ansible and download the AWS credentials CSV
-- use prepd to create the project using the repo_url and path names (tf_creds and ansible_creds) to CSV files
-
-```ruby
-c = Client.find_by(name: 'Acme')
-c.projects.new(name: 'widget', repo_url: 'git@github.com:my_git_hub_account/widget.git')
-c.tf_creds = 'Users/dude/aws/widget-terraform.csv'
-c.ansible_creds = 'Users/dude/aws/widget-ansible.csv'
-c.save
-```
-
-## New Application
-
-View the [lego README.md](https://github.com/rjayroach/lego) on creating micro serivce applications with Rails and Ember
-
-## Bring Up the Machine
-
-```ruby
-cd ~/prepd/acme/widget
+cd awesome-project
 vagrant up
+```
+
+2. Connect to the VM
+
+Before connecting, ensure you have loaded your ssh key into ssh agent so that you can access git repostories from inside the VM
+
+If you have configured ssh for connections to the .local domain then:
+
+```bash
+ssh-add
+ssh node0.awesome-project.my-client.local
+```
+
+Otherwise, use vagrant to connect:
+
+```bash
+ssh-add
+cd ~/projects/my-client
 vagrant ssh
 ```
 
+## Develop your Project
 
-# Credentials
-
-## Project Credentials
-Prepd will create the following credential (hidden) files in project_root:
-
-- .boto: AWS IAM credentials that give read only access to Ansible
-- .developer.yml: Developer’s git account (and other account) details
-- .terraform-vars.txt: AWS IAM credentials that give full access to CRUD AWS resources
-- .vault-password.txt: a UUID used to encrypt and decrypt ansible vault files
-- .id_rsa.pub: the public key uploaded to AWS as the primary key pair for accessing EC2 instances
-- .id_rsa: the private key
-
-- terraform will use project_root/id_rsa.pub to upload key_material to AWS for the machine key
-- config-development.yml checks the project_root and: 1) if .boto exists link it, 2) if id_rsa and id_rsa.pub exist then link them
-- the developer can then do ssh-add which will auto load ~/.ssh/id_rsa to login or run ansible
-
-
-## Transfer Credentials to New Machine
-
-The prepd gem can encrypt the credentials using gpg which must be installed on the host machine
-
-The encrypted credentials are written to and read from the user's home directory so that they are not accidentally
-committed to the project repository
-
-### Encrypt
-
-```ruby
-pry -r ./prepd.rb
-p.encrypt
-```
-
-This will create a tar file containing the various project credentials. It will then invoke gpg to encrypt the archive.
-The credentials will be placed in the project's data directory
-
-You will be prompted for a passphrase to enter twice. After doing that send the file by email or other mechanism
-
-### Decrypt
-
-On the target machine, use prepd to decrypt the file and place it in the correct directory
-
-- Clone the project repository
-- Place the gpg tar file in the project's data directory
-- Run prepd. It will expect to find the credentials file in the project's data directory
-
-```ruby
-pry -r ./prepd.rb
-p.decrypt
-```
-
-## Authorization
-
-If giving a developer access to the machine for development only (not terraform or ansible) then add their public key to the
-instance’s ~/.ssh/authorized_keys. The developer uses ssh-agent forwarding to access the machine from the VM
+1. See [understanding prepd components](https://github.com/rjayroach/prepd/blob/master/docs/prepd-overview.md)
 
 
 # Contributing
