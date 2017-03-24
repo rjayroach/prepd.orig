@@ -6,95 +6,47 @@ This repository creates a Virutal Machine that consists of:
 - A cloud infrastructure provisioning system based on Terraform templates and modules
 - A machine and application configuration tool based on Ansible playbooks and roles
 
-# Deployment
-
-## Monolithic Infrastructure and Application
-
-For cases where the application is dependent on a specific set of infrastructure and that
-infrastructure is dedicated to the application so they for an indivisible component
 
 
-### Define and Configure
+# Prepd Actors
 
-1. Define the Infrastructure for the Application
+A Client may have multiples projects. Applications share common infrastructure that is defined by the Project
 
-The infrastructure is defined in a subdirectory of terraform/components named after the application, e.g. 'default'
-
-```bash
-cd ~/prepd/terraform
-vi components/default/main.tf
-```
-
-2. Set configuration values for the Infrastructure and Application
-
-```bash
-cd ~/prepd/ansible
-vi group_vars/all/default.yml
-vi inventory/staging/ec2.ini
-ave group_vars/staging/vault
-vi apps/default/tasks/main.yml
-```
+- Client: An organization with one or more projects, e.g Acme Corp
+- Project: A definition of infrastructure provided for one or more applications
+- Application: A logical group of deployable repositories, e.g. a Rails API server and an Ember web client
 
 
-### Spin Up the Monolith
+## Projects
 
-1. Use Ansible to configure Terraform
+- A project is comprised of Infrastructure Environments (IE) and Application Groups (AG)
+- Infrastructure Environemnts are defined separately for each environment
+- Application Groups are deployed into one or more Infrastructure EnvironmentS
 
-```bash
-cd ~/prepd/ansible
-./config-provisioner.yml
-./default-provisioner.yml -i inventory/staging
-```
+## Infrastructure Environments
 
-2. Bring up the Infrastructure
+Infrastructure is either Vagrant machines for development and local environments or EC2 instances for staging and production
 
-```bash
-cd ~/prepd/terraform/staging/default
-tgp
-```
+Local, Staging and Production Environments use a Docker swarm network to manage applicaiton groups
 
-3. Use Ansible to configure the infrastructure
+- local: virtual machines running on laptop via vagrant whose primary purpose is application development
+- development: primary purpose is also application development, but the infrastructure is deployed in the cloud (AWS)
+- staging: a mirror of production in every way with the possible exception of reduced or part-time resources
+- production: production ;-)
 
-```bash
-cd ~/prepd/ansible
-./config-master.yml -i inventory/staging
-```
+## Applications
 
-4. Use Ansible to deploy the application
-
-```bash
-cd ~/prepd/ansible
-./default-master.yml -i inventory/staging
-```
+Applications are the content that actually gets deployed. The entire purpose of prepd is to provide a consistent
+and easy to manage infrastructure for each environment into which the application will be deployed.
 
 
-## Decoupled Infrastructure and Applications
+# Usage
 
-This would apply in cases such as a Kubernetes cluster is provisioned and made available for applications which come later
+## New Application
 
-### Infrastructure
-
-### Applications
+View the [lego README.md](https://github.com/rjayroach/lego) on creating micro serivce applications with Rails and Ember
 
 
-# Quick Start
-
-## Clone an Existing Project
-
-- Use git to clone this repository
-- Pull the git submodules: `git submodule update --init --recursive`
-- Use prepd tool to [copy product credentials](https://github.com/rjayroach/prepd#transfer-credentials-to-new-machine)
-- Boot the Development Environment
-
-```bash
-vagrant up
-```
-
-OR
-
-## Create a New Project
-
-View the [prepd README.md](https://github.com/rjayroach/prepd)
 
 
 # Overview

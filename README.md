@@ -101,17 +101,16 @@ Prepd will be augmented to provide playbooks for the default Application Group a
 
 ## Setup
 
-Prepd requires the following software on the local machine: VirtualBox, Vagrant and Ansible.
+1. Prepd requires the following software on the local machine: VirtualBox, Vagrant and Ansible.
+See [this document](https://github.com/rjayroach/prepd/blob/master/docs/install-dependencies.md) for steps to install dependencies on your local machine
 
-1. [Install Dependencies](https://github.com/rjayroach/prepd/blob/master/docs/install-dependencies.md) on your local machine
-
-2. Create an organization, e.g. client, directory for the project(s)
+2. Create a parent directory for the organization or client in which will be created a sub-directory for the project(s)
 
 ```bash
 mkdir -p ~/projects/my-client
 ```
 
-### Start a New Project
+### Start on a New Project
 
 Clone this repository into the organization directory
 
@@ -120,9 +119,9 @@ cd ~/projects/my-client
 git clone git@github.com:rjayroach/prepd.git awesome-project
 ```
 
-### Start with an Existing Project
+### Start on an Existing Project
 
-1. Clone the existing project and pull the git submodules
+1. Clone the existing project into the organization directory and pull the git submodules
 
 ```bash
 cd ~/projects/my-client
@@ -133,10 +132,10 @@ git submodule update --init --recursive
 
 2. Install project credentials
 
-Use prepd tool to [copy product credentials](https://github.com/rjayroach/prepd/blob/master/docs/credentials.md)
+Use prepd tool to [copy product credentials](https://github.com/rjayroach/prepd/blob/master/docs/credentials.md#decrypt)
 
 
-## Connect to Project VM
+## Connect to the Project VM
 
 1. Start the VM
 
@@ -150,6 +149,8 @@ vagrant up
 2. Connect to the VM
 
 Before connecting, ensure you have loaded your ssh key into ssh agent so that you can access git repostories from inside the VM
+
+The VM will have a unique hostname following this nomenclature: node0.project-name.organization-name.local
 
 If you have configured ssh for connections to the .local domain then:
 
@@ -168,7 +169,8 @@ vagrant ssh
 
 ## Develop your Project
 
-1. See [understanding prepd components](https://github.com/rjayroach/prepd/blob/master/docs/prepd-overview.md)
+1. See [understanding prepd components](https://github.com/rjayroach/prepd/blob/master/docs/README.md)
+2. See [deploy your application](https://github.com/rjayroach/prepd/blob/master/docs/deployment.md)
 
 
 # Contributing
