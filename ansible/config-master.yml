@@ -2,7 +2,7 @@
 ---
 - hosts: master:&local
 
-  vars_files: ['../data/credentials/developer.yml']
+  vars_files: ['{{ credentials_dir }}/developer.yml']
 
   roles:
     - { role: common, machine_env: '{{ config_envs.machine_env }}' }
@@ -18,7 +18,7 @@
 #       For now it is just installing docker on staging server to run the recheck docker container
 - hosts: master:!local
 
-  vars_files: ['../data/credentials/developer.yml']
+  vars_files: ['{{ credentials_dir }}/developer.yml']
 
   roles:
     - { role: common, machine_env: '{{ config_envs.machine_env }}' }

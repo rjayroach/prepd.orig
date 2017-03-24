@@ -2,6 +2,10 @@ require 'csv'
 require 'securerandom'
 require 'mkmf'
 
+def p
+  @p ||= Prepd::Project.new
+end
+
 module Prepd
   class Project
     attr_accessor :tf_creds, :tf_key, :tf_secret, :ansible_creds, :ansible_key, :ansible_secret
@@ -193,17 +197,17 @@ module Prepd
       require 'mkmf'
       rv = find_executable(name)
       STDOUT.puts "#{name} executable not found" unless rv
-      FileUtils.rm('mkmf.log')
+      FileUtils.rm_rf('mkmf.log')
       rv
     end
 
     def file_list(mode)
-      return "boto id_rsa id_rsa.pub terraform/default.tfvars vault-password.txt" if mode.eql?(:all)
-      "vault-password.txt"
+      return "credentials" if mode.eql?(:all)
+      "#{creds_path}/vault-password.txt"
     end
 
     def archive(type = :credentials)
-      t_path = type.eql?(:credentials) ? data_path : path
+      t_path = type.eql?(:credentials) ? creds_path : path
       "#{t_path}/#{host_name('-')}-#{type}.tar"
     end
 
@@ -216,7 +220,7 @@ module Prepd
     end
 
     def creds_path
-      "#{data_path}/credentials"
+      "#{path}/credentials"
     end
 
     def path

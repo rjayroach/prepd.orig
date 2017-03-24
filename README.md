@@ -287,9 +287,7 @@ committed to the project repository
 ### Encrypt
 
 ```ruby
-prepd
-c = Client.find_by(name: 'Acme')
-p = c.projects.find_by(name: 'widget')
+pry -r ./prepd.rb
 p.encrypt
 ```
 
@@ -307,9 +305,7 @@ On the target machine, use prepd to decrypt the file and place it in the correct
 - Run prepd. It will expect to find the credentials file in the project's data directory
 
 ```ruby
-prepd
-c = Client.find_by(name: 'Acme')
-p = c.projects.find_by(name: 'widget')
+pry -r ./prepd.rb
 p.decrypt
 ```
 
@@ -319,15 +315,9 @@ If giving a developer access to the machine for development only (not terraform 
 instance’s ~/.ssh/authorized_keys. The developer uses ssh-agent forwarding to access the machine from the VM
 
 
-# Development
-
-After checking out the repo, run `bin/setup` to install dependencies. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
-
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
-
 # Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/prepd. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
+Bug reports and pull requests are welcome on GitHub at https://github.com/rjayroach/prepd. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
 
 
 # License

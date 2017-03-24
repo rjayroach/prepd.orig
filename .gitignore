@@ -1,6 +1,8 @@
 .vagrant/
 .DS_Store
 /data/
-!data/credentials/.keep
+!data/.keep
+/credentials/
+!credentials/.keep
 .terraform/
 *.tfvars

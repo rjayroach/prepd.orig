@@ -2,12 +2,14 @@
 # NOTE: System vars - Change these values with care!
 ---
 prepd_dir: '{{ playbook_dir.split("/")[0:-1] | join("/") }}'
+
+credentials_dir: '{{ prepd_dir }}/credentials'
 data_dir: '{{ prepd_dir }}/data'
 kubernetes_dir: '{{ prepd_dir }}/kubernetes'
 tf_dir: '{{ prepd_dir }}/terraform'
 
-ssh_dir: '{{ ansible_env.HOME }}/.ssh'
 cert_dir: '{{ data_dir }}/cert'
+ssh_dir: '{{ ansible_env.HOME }}/.ssh'
 
 ### 'application-*' variables
 # application name comes from ~/prepd/ansible/<application_name>/application.yml
