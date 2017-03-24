@@ -101,10 +101,10 @@ Prepd will be augmented to provide playbooks for the default Application Group a
 
 ## Setup
 
-1. Prepd requires VirtualBox, Vagrant and Ansible to be installed on the local machine.
+Prepd requires VirtualBox, Vagrant and Ansible to be installed on the local machine.
 See [this document](https://github.com/rjayroach/prepd/blob/master/docs/install-dependencies.md) for steps to install those dependencies
 
-2. Create a parent directory for the organization or client which will have a sub-directory for the project(s)
+Create a parent directory for the organization or client which will have a sub-directory for the project(s)
 
 ```bash
 mkdir -p ~/projects/my-client
@@ -133,14 +133,17 @@ git submodule update --init --recursive
 
 ## Connect to the Project VM
 
-Start the VM. The first time the machine is booted it will take several minutes to configure tooling, etc.
+1. Start the VM
+
+Note that the first time the machine is booted it will take several minutes to configure tooling, etc.
 
 ```bash
 cd awesome-project
 vagrant up
 ```
 
-Connect to the VM.
+2. Connect to the VM
+
 Before connecting, ensure you have loaded your ssh key into ssh agent so that you can access git repostories from inside the VM
 The VM will have a unique hostname following this nomenclature: node0.project-name.organization-name.local
 
@@ -159,7 +162,7 @@ cd ~/projects/my-client
 vagrant ssh
 ```
 
-If you cloned an existing project then you need to [copy product credentials](https://github.com/rjayroach/prepd/blob/master/docs/credentials.md#decrypt) to your VM
+3. If you cloned an existing project then you need to [copy product credentials](https://github.com/rjayroach/prepd/blob/master/docs/credentials.md#decrypt) to your VM
 
 
 ## Develop your Project
