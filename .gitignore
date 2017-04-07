@@ -4,5 +4,6 @@
 !data/.keep
 /credentials/
 !credentials/.keep
+ansible/group_vars/*/tf_*
 .terraform/
 *.tfvars

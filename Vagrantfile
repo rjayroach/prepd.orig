@@ -38,7 +38,7 @@ Vagrant.configure(2) do |config|
   config.hostmanager.ignore_private_ip = false
 
   (0..3).each do |i|
-    master = autostart = forward_ports = i.eql?(0)
+    autostart = forward_ports = i.eql?(0)
     config.vm.define "node#{i}", autostart: autostart do |node|
       node.vm.provider :virtualbox do |v|
         v.name = "node#{i}.#{host_name}.local"
@@ -71,7 +71,7 @@ Vagrant.configure(2) do |config|
       # Configuration
       node.vm.provision :ansible_local do |ansible|
         ansible.install = false
-        ansible.playbook = master ? 'config-master.yml' : 'config-cluster.yml'
+        ansible.playbook = 'infra-config.yml'
         ansible.provisioning_path = "/home/vagrant/#{project_name}/ansible"
         ansible.inventory_path = 'inventory/local'
         ansible.limit = "node#{i}.local"
