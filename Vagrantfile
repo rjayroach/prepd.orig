@@ -1,5 +1,5 @@
 # TODO: prepd is a directory in prepd-project that can be invoked with cli as well
-
+ssh_intf = 'eth1'
 def invoke_prepd?
   ARGV[0].eql?('up') and File.exist?('prepd.rb')
 end
@@ -53,7 +53,7 @@ Vagrant.configure(2) do |config|
       node.hostmanager.aliases = ["node#{i}.local"]
       node.hostmanager.ip_resolver = proc do |vm, resolving_vm|
         if hostname = (vm.ssh_info && vm.ssh_info[:host])
-          `vagrant ssh node#{i} -c "/sbin/ifconfig eth1" | grep "inet addr" | tail -n 1 | egrep -o "[0-9\.]+" | head -n 1 2>&1`.split("\n").first[/(\d+\.\d+\.\d+\.\d+)/, 1]
+          `vagrant ssh node#{i} -c "/sbin/ifconfig #{ssh_intf}" | grep "inet addr" | tail -n 1 | egrep -o "[0-9\.]+" | head -n 1 2>&1`.split("\n").first[/(\d+\.\d+\.\d+\.\d+)/, 1]
         end
       end
 
