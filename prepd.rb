@@ -85,6 +85,9 @@ module Prepd
     # NOTE: The path to credentials is used in the ansible-role prepd
     #
     def generate_credentials
+      %w(aws keys certs).each do |subdir|
+        FileUtils.mkdir_p "#{creds_path}/#{subdir}"
+      end
       generate_tf_creds
       generate_ansible_creds
       generate_ssh_keys
@@ -95,11 +98,11 @@ module Prepd
     # By default, look for downloaded AWS credentials in CSV format in these locations
     #
     def tf_creds
-      @tf_creds ||= "#{creds_path}/terraform/default.csv"
+      @tf_creds ||= "#{creds_path}/aws/terraform.csv"
     end
 
     def ansible_creds
-      @ansible_creds ||= "#{creds_path}/boto.csv"
+      @ansible_creds ||= "#{creds_path}/aws/ansible.csv"
     end
 
     def generate_tf_creds
@@ -108,11 +111,12 @@ module Prepd
         STDOUT.puts 'tf_key and tf_secret need to be set (or set tf_creds to path to CSV file)'
         return
       end
-      Dir.chdir(creds_path) do
-        FileUtils.mkdir_p 'terraform'
-        File.open('terraform/default.tfvars', 'w') do |f|
-          f.puts("aws_access_key_id = \"#{tf_key}\"")
-          f.puts("aws_secret_access_key = \"#{tf_secret}\"")
+      Dir.chdir("#{creds_path}/aws") do
+        File.open('terraform.yml', 'w') do |f|
+          f.puts('---')
+          f.puts('terraform_default:')
+          f.puts("  aws_access_key_id: #{tf_key}")
+          f.puts("  aws_secret_access_key: #{tf_secret}")
         end
       end
     end
@@ -123,11 +127,12 @@ module Prepd
         STDOUT.puts 'ansible_key and ansible_secret need to be set (or set ansible_creds to path to CSV file)'
         return
       end
-      Dir.chdir(creds_path) do
-        File.open('boto', 'w') do |f|
-          f.puts('[profile default]')
-          f.puts("aws_access_key_id = #{ansible_key}")
-          f.puts("aws_secret_access_key = #{ansible_secret}")
+      Dir.chdir("#{creds_path}/aws") do
+        File.open('ansible.yml', 'w') do |f|
+          f.puts('---')
+          f.puts('ansible_default:')
+          f.puts("  aws_access_key_id: #{ansible_key}")
+          f.puts("  aws_secret_access_key: #{ansible_secret}")
         end
       end
     end
@@ -136,7 +141,7 @@ module Prepd
     # Generate a key pair to be used as the EC2 key pair
     #
     def generate_ssh_keys(file_name = 'id_rsa')
-      Dir.chdir(creds_path) { system("ssh-keygen -b 2048 -t rsa -f #{file_name} -q -N '' -C 'ansible@#{host_name}.local'") }
+      Dir.chdir("#{creds_path}/keys") { system("ssh-keygen -b 2048 -t rsa -f #{file_name} -q -N '' -C 'ansible@#{host_name}.local'") }
     end
 
     #

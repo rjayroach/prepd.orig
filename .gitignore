@@ -3,7 +3,7 @@
 /data/
 !data/.keep
 /credentials/
-!credentials/.keep
+!credentials/README
 ansible/group_vars/*/tf_*
 .terraform/
 *.tfvars
