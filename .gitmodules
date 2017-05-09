@@ -1,0 +1,9 @@
+[submodule "ansible/roles/prepd"]
+	path = ansible/roles/prepd
+	url = git@github.com:rjayroach/prepd-roles.git
+[submodule "ansible/roles/terraplate"]
+	path = ansible/roles/terraplate
+	url = git@github.com:rjayroach/terraplate.git
+[submodule "ansible/roles/terraplate-components"]
+	path = ansible/roles/terraplate-components
+	url = git@github.com:rjayroach/terraplate-components.git
