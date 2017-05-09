@@ -1,0 +1,31 @@
+---
+- include_role:
+    name: prepd/git-repos
+  vars:
+    repos: '{{ git_repos }}'
+
+- include_role:
+    name: prepd/env
+  vars:
+    apps: '{{ env_apps }}'
+
+- include_role:
+    name: prepd/postgres-utils
+  vars:
+    action: 'create-databases'
+    postgres_databases: '{{ databases }}'
+
+- include_role:
+    name: prepd/rails
+  vars:
+    apps: '{{ rails_apps }}'
+
+- include_role:
+    name: prepd/ember
+  vars:
+     apps: '{{ ember_apps }}'
+
+- include_role:
+    name: prepd/tmuxinator
+  vars:
+    files: '{{ tmuxinator_files }}'

@@ -1,6 +1,0 @@
-#!/usr/bin/env ansible-playbook
----
-- include: config/cluster.yml
-- include: config/kubernetes.yml
-- include: config/swarm-mode.yml
-- include: config/swarm.yml

@@ -38,7 +38,7 @@ Installing ember-cli-deploy creates config/deploy.js
 - Documented here: https://github.com/ember-cli-deploy/ember-cli-deploy-s3#quick-start
 - Terraform writes the credentials to /tmp/s3_bucket_credentials.yml
 - Manually copy the values from that file to inventory/group_vars/all/vault
-- run recheck-development.yml to write out the env file
+- run app-development.yml to write out the env file
 
 ### config/deploy.js
 
@@ -122,4 +122,4 @@ The application is responsible for loading the ENV file
 - each environment has it's own VPC and sub-domain, e.g. staging
 - the application is served from an S3 bucket which responds to application.environment.domain
 - the API server is behind an ELB which is mapped to application-api.environment.domain
-- CORS also needs to be setup in Rails that allows recheck.staging.rhodesedge.com
+- CORS also needs to be setup in Rails that allows app.staging.example.com

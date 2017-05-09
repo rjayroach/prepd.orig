@@ -1,0 +1,63 @@
+#!/usr/bin/env ansible-playbook
+# NOTES:
+# - The infrastructure_env is specified in the command line so the playbook already knows into which env the app is being deployed
+# - By default This playbook deploys all flavors of the application into the following infrastructure services:
+#    'foo-bar' (tag_Service_foo_bar) and 'api-server' (tag_Component_api_server)
+#    'foo-baz' (tag_Service_foo_baz) and 'api-server' (tag_Component_api_server)
+#    'foo-cluster' (tag_Service_foo_cluster) (TBD)
+---
+# 'foo-bar' deploys each flavor of the app as a docker container onto an instance dedictated exclusively to that flavor
+# To limit deployment to just foo-bar machines run with -l foo-bar
+# To limit the flavor to be deployed specify -l [processor|training|sales] (tag_Resource_processor)
+# To limit deployment to just foo-bar and flavor run with -l 'foo-bar:&processor'
+
+- hosts: app-servers
+  vars_files: ['{{ credentials_dir }}/developer.yml']
+  tasks:
+    - include_role:
+        name: deploy
+        tasks_from: container # development
+      vars:
+        image_tag: develop
+
+
+# 'foo-cluster' deploys each flavor of the app into a kubernetes cluster
+# TODO: Implement this which is probably creating k8s pod definitions on localhost for deployment into the cluster
+- hosts: api-server
+  tasks:
+    - group_by: key=foo-kubernetes
+
+# This play hasn't been implemented. It is here to show an alternative installation to k8s which is docker-swarm
+# The idea is to reuse the compose definition in container.yml but deploy to a swarm cluster
+- hosts: swarm:&master
+  vars_files: ['{{ credentials_dir }}/developer.yml']
+  tasks:
+    # - include: foo/deploy/container.yml image_tag='develop'
+
+#
+# - hosts: dev
+# 
+#   vars_files: ['{{ credentials_dir }}/developer.yml']
+# 
+#   roles:
+#     - { role: git-repos, repos: '{{ git_repos }}' }
+#     - { role: env, apps: '{{ env_apps }}' }
+#     - { role: postgres-utils, action: 'create-databases', postgres_databases: '{{ databases }}' }
+#     - { role: rails, apps: '{{ rails_apps }}' }
+#     - { role: ember, apps: '{{ ember_apps }}' }
+#     - { role: tmuxinator, files: '{{ tmuxinator_files }}' }
+
+
+# NOTE: this is to simulate CI/CD on the local cluster first before implementing with circleci for staging
+# - clusters are named after the environment plus number, e.g. staging0, staging1, just like nodes
+# - ~/.kube/config will have multiple clusters, e.g. staging0, etc
+# TODO: playbook uses command: kubectl to deploy the container into the cluster, setting the kubectl cluster name first
+# TODO: maybe foo-config for cluster should launch the manager and prometheus containers whereas
+# this playbook is only concerned with the foo application's related k8s pods, secrets, etc
+- hosts: foo-kubernetes
+
+  vars_files: ['{{ credentials_dir }}/developer.yml']
+
+  tasks:
+    - name: Deploy the container into the k8s cluster
+      debug: var=config.cluster_type

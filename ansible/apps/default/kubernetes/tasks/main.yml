@@ -1,6 +1,0 @@
-# NOTE: this is to simulate CI/CD on the local cluster first before implementing with circleci for staging
-# - clusters are named after the environment plus number, e.g. staging0, staging1, just like nodes
-# - ~/.kube/config will have multiple clusters, e.g. staging0, etc
-# TODO: playbook uses command: kubectl to deploy the container into the cluster, setting the kubectl cluster name first
----
-- debug: var=config.cluster_type

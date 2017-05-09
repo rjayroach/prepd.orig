@@ -1,0 +1,26 @@
+#!/usr/bin/env ansible-playbook
+---
+- hosts: app-servers
+  tasks:
+    - include_role:
+        name: config
+        tasks_from: app-server
+
+- hosts: dev-servers
+  tasks:
+    - include_role:
+        name: config
+        tasks_from: dev-server
+
+- hosts: web-servers
+  tasks:
+    - include_role:
+        name: config
+        tasks_from: web-server
+
+# Configure host for source code deployments
+- hosts: local:&master
+  tasks:
+    - group_by: key=dev
+  roles:
+    #- { role: circleci, projects: '{{ circleci_projects }}' }

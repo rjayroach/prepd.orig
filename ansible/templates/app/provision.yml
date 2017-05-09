@@ -1,0 +1,70 @@
+#!/usr/bin/env ansible-playbook
+# export TF_VAR_ec2_key_pair_public_key_path=/home/vagrant/terraplate/playbooks/credentials/keys
+---
+- hosts: provisionerx
+  pre_tasks:
+    # NOTE: This is only intended to be used by a bastion host; For mapping internal instances create a new task
+    # Creating the key and updating ssh config are really two separate tasks
+    # The task to update ssh config could be done against the bastion host in a separate play
+    - include_role:
+        name: terraplate
+        tasks_from: host-ssh
+      vars:
+        host: '{{ mfwa_instance_pro_train_bastion_route53_record.tfvars.name }}'
+        private_key_path: '{{ ssh_dir }}/{{ mfwa_instance_pro_train_bastion_route53_record.tfvars.name }}'
+        subnets:
+          - '{{ mfwa_instance_pro_train_vpc_vpc_subnet_private.tfvars.cidr_block }}' 
+          - '{{ mfwa_instance_pro_train_vpc_vpc_subnet_public.tfvars.cidr_block }}' 
+    - include_role:
+        name: terraplate
+        tasks_from: get-current-ip
+
+- hosts: provisioner
+  roles:
+    - { role: terraplate/package, name: 'mfwa' }
+    # Generate Terraform templates for subdomains (rl.staging.re.com, rl.development.re.com and rl.re.com)
+    # - { role: terraplate-components/aws/subdomain, ns: 'dns', name: 'domain' }
+
+- hosts: provisioner
+  pre_tasks:
+    - include_role:
+        name:  provision
+        tasks_from: vpc
+      vars:
+        ns: pro-train
+  roles:
+    - { role: terraplate-components/aws/vpn, ns: 'pro-train', name: 'vpn' }
+
+- hosts: provisioner
+  tasks:
+    - include_role:
+        name:  provision
+        tasks_from: app
+      vars:
+        ns: processor
+
+- hosts: provisioner
+  tasks:
+    - include_role:
+        name:  provision
+        tasks_from: app
+      vars:
+        ns: training
+  roles:
+    - { role: terraplate-components/aws/rds, ns: 'training', name: 'database' }
+
+- hosts: provisioner
+  tasks:
+    - include_role:
+        name:  provision
+        tasks_from: vpc
+      vars:
+        ns: sales
+
+- hosts: provisioner
+  tasks:
+    - include_role:
+        name:  provision
+        tasks_from: app
+      vars:
+        ns: sales

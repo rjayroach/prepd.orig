@@ -1,0 +1,20 @@
+### Environment
+[local]
+node[0:3].local ansible_user=vagrant
+provisioner ansible_host=localhost ansible_connection=local
+
+[local:vars]
+infrastructure_env=local
+
+### Roles
+[tag_Role_master]
+node0.local
+
+[tag_Role_etcd]
+node1.local
+
+[tag_Role_controller]
+node1.local
+
+[tag_Role_worker]
+node[2:3].local

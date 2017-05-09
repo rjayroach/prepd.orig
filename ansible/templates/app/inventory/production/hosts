@@ -1,0 +1,10 @@
+### Dynamic Environments
+[tag_Environment_production]
+# always include localhost so we can run playbooks against this inventory and apply the appropriate group_vars
+provisioner ansible_host=localhost ansible_connection=local
+
+[production:children]
+tag_Environment_production
+
+[production:vars]
+infrastructure_env=production

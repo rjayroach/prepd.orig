@@ -1,0 +1,27 @@
+### Local Roles
+[tag_Role_master]
+
+[master:children]
+tag_Role_master
+
+
+### Kubernetes Roles
+[tag_Role_controller]
+
+[controller:children]
+tag_Role_controller
+
+
+[tag_Role_worker]
+
+[worker:children]
+tag_Role_worker
+
+
+[tag_Role_etcd]
+
+[etcd:children]
+tag_Role_etcd
+
+
+### Application Roles

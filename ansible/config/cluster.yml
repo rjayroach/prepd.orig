@@ -1,6 +1,0 @@
----
-- hosts: all
-  name: Create a group of all hosts by cluster type from var
-  tasks:
-    - debug: var=config_envs.cluster_type
-    - group_by: key={{ config_envs.cluster_type }}
