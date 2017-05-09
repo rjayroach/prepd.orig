@@ -1,6 +1,6 @@
 #!/usr/bin/env ansible-playbook
 ---
-- hosts: web-servers
+- hosts: all
   tasks:
     - debug: var=playbook_dir
     - debug: var=ansible_dir
@@ -8,10 +8,8 @@
     - debug: var=infrastructure_env
     - debug: var=tf_dir
     - debug: var=credentials_dir
-    # - include_role:
-    #     name:  provision
-    #     tasks_from: vpc
-    #   vars:
-    #     ns: pro-train
-  roles:
-    - prepd/nginx
+    - include_role:
+        name:  prepd/prepd
+        tasks_from: test
+        vars:
+          test: success!
