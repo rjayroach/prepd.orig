@@ -17,12 +17,12 @@ module Prepd
     def create
       STDOUT.puts '### Running prepd'
       # configure
-      setup_git
+      # setup_git
       clone_submodules
       copy_developer_yml
       generate_credentials
       encrypt_vault_files
-      commit_git
+      # commit_git
     end
 
     # NOTE: Re-enable this function if/when there is a need for the user to modify values
@@ -35,7 +35,7 @@ module Prepd
     # end
 
     #
-    # Clone prepd-project, remove the git history and start with a clean repository
+    # Clone prepd, remove the git history and start with a clean repository
     #
     def setup_git
       Dir.chdir(path) do
@@ -56,12 +56,14 @@ module Prepd
     # Clone ansible roles and terraform modules
     #
     def clone_submodules
-      Dir.chdir("#{path}/ansible") do
-        system('git submodule add git@github.com:rjayroach/ansible-roles.git roles')
+      Dir.chdir("#{path}/ansible/roles") do
+        system('git submodule add git@github.com:rjayroach/prepd-roles.git prepd')
+        system('git submodule add git@github.com:rjayroach/terraplate.git')
+        system('git submodule add git@github.com:rjayroach/terraplate-components.git')
       end
-      Dir.chdir("#{path}/terraform") do
-        system('git submodule add git@github.com:rjayroach/terraform-modules.git modules')
-      end
+      # Dir.chdir("#{path}/terraform") do
+      #   system('git submodule add git@github.com:rjayroach/terraform-modules.git modules')
+      # end
     end
 
     #
