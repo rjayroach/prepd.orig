@@ -1,6 +1,6 @@
 #!/usr/bin/env ansible-playbook
 ---
-- hosts: all
+- hosts: provisioner
   tasks:
     - debug: var=playbook_dir
     - debug: var=ansible_dir
@@ -11,5 +11,5 @@
     - include_role:
         name:  prepd/prepd
         tasks_from: test
-        vars:
+      vars:
           test: success!
