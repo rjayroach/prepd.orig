@@ -28,11 +28,6 @@
 - name: Copy files
   command: 'cp -a {{ template_dir }}/ops {{ project_dir }}'
 
-- name: Create ansible.cfg
-  template:
-    src: ansible.cfg.j2
-    dest: '{{ target_dir }}/ansible/ansible.cfg'
-
 - name: Create project.yml
   template:
     src: project.yml.j2
