@@ -5,4 +5,3 @@
 !data/.keep
 /credentials/*
 !credentials/README.md
-ansible/new-project.yml

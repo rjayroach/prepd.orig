@@ -21,8 +21,12 @@
 - hosts: dev-servers:&local
   tags: config
   roles:
-    - { role: prepd/circleci, tags: [config], projects: '{{ circleci_projects }}' }
     - prepd/prepd
     - prepd/prepd-tools
     # - ember
     # - { role: prepd/nodejs, nodejs_version: '6.9.0' }
+
+- hosts: dev-servers:&local
+  tags: deploy
+  roles:
+    - { role: prepd/circleci, tags: [config], projects: '{{ circleci_projects }}' }

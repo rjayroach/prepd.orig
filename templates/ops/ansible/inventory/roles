@@ -49,6 +49,7 @@ tag_Role_api_server_yes
 tag_Role_app_server_yes
 
 [tag_Role_dev_server_yes]
+node0.local
 
 [dev-servers:children]
 tag_Role_dev_server_yes
