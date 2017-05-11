@@ -67,9 +67,9 @@
     chdir: '{{ target_dir }}'
     creates: '{{ item.location }}'
   with_items:
-    - { repo: 'git@github.com:rjayroach/prepd-roles.git', location: 'ansible/roles/community/prepd' }
-    - { repo: 'git@github.com:rjayroach/terraplate.git', location: 'ansible/roles/community/terraplate' }
-    - { repo: 'git@github.com:rjayroach/terraplate-components.git', location: 'ansible/roles/community/terraplate-components' }
+    - { repo: 'git@github.com:rjayroach/prepd-roles.git', location: 'ansible/community-roles/prepd' }
+    - { repo: 'git@github.com:rjayroach/terraplate.git', location: 'ansible/community-roles/terraplate' }
+    - { repo: 'git@github.com:rjayroach/terraplate-components.git', location: 'ansible/community-roles/terraplate-components' }
 
 - name: Add files and make first commit
   command: '{{ item }}'
