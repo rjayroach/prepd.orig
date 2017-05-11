@@ -1,0 +1,24 @@
+# dev-server/tasks/config
+---
+# - include_role:
+#     name: prepd/common
+#     vars:
+#        machine_env: '{{ config_envs.machine_env }}'
+
+- include_role:
+    name: prepd/yadr
+
+- include_role:
+    name: prepd/developer
+
+- include_role:
+    name: prepd/developer-tools
+
+- include_role:
+    name: prepd/git
+
+- include_role:
+    name: prepd/postgres
+
+- include_role:
+    name: prepd/redis

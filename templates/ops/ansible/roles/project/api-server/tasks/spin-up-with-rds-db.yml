@@ -1,0 +1,39 @@
+---
+- name: 'Spin up {{ application_flavor }} containers'
+  docker_service:
+    project_name: '{{ application_name }}{{ application_flavor }}'
+    pull: yes
+    definition:
+      version: '2'
+      services:
+        redis:
+          image: redis
+        api:
+          depends_on:
+            - redis
+          environment: '{{ envs_list }}'
+          image: '{{ image_name }}:{{ image_tag }}'
+          ports:
+            - '{{ host_port }}:3000'
+          volumes:
+            - '/home/admin/{{ application_flavor }}/data:/data'
+        # scheduler:
+        #   command: 'bundle exec rake scheduler'
+        #   depends_on:
+        #     - db
+        #     - redis
+        #   environment: '{{ envs_list + redis_env }}'
+        #   image: '{{ image_name }}:{{ image_tag }}'
+        #   volumes:
+        #     - '/home/admin/data:/data'
+
+        # resque:
+        #   command: 'bundle exec rake resque:work'
+        #   depends_on:
+        #     - db
+        #     - redis
+        #   environment: '{{ envs_list + redis_env }}'
+        #   image: '{{ image_name }}:{{ image_tag }}'
+        #   volumes:
+        #     - '/home/admin/data:/data'
+#

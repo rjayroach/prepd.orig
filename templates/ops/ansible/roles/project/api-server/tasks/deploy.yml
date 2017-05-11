@@ -1,0 +1,33 @@
+# api-server/tasks/deploy.yml
+---
+# - debug: var='{{ item }}'
+#   with_items: [vault_defaults, defaults, vault_current, current]
+
+- set_fact:
+    api_server: "{{ vault_defaults | combine(vault_current) | combine(defaults) | combine(current) | combine(tf_rds) }}"
+    # api_server: "{{ api_server_defaults_vault | combine(defaults) | combine(current_vault) | combine(current) | combine(tf_rds) }}"
+- set_fact:
+    envs_string: '{% for key, value in api_server.iteritems() %}{{ key }}={{ value }}{% if not loop.last %},{% endif %}{% endfor %}'
+- set_fact:
+    envs_list: '{{ envs_string.split(",") }}'
+- set_fact:
+    redis_env:
+      - TERM_CHILD=1
+      - QUEUE=*
+- debug: var=envs_list
+
+
+- include: spin-up-with-container-db.yml
+  when: api_server.DATABASE_HOST == 'db'
+
+- include: spin-up-with-rds-db.yml
+  when: api_server.DATABASE_HOST != 'db'
+
+- name: Migrate the database
+  command: 'docker exec -t {{ application_name}}{{ application_flavor }}_api_1 bundle exec rake db:migrate'
+
+# - name: Clean the database
+# command: 'bundle exec rake db:clean:migrate'
+
+# - name: Seed the database
+#   command: 'docker exec -t {{ application_name}}{{ application_flavor }}_api_1 bundle exec rake db:seed'

@@ -1,0 +1,9 @@
+---
+- name: List any current ssh sessions on local port
+  shell: ps axuf | grep {{ tunnel_port }} | grep ssh | awk '{print "kill -9 " $2}'
+  register: kill
+
+- name: Kill any current ssh sessions on local port
+  shell: '{{ item }}'
+  with_items: '{{ kill.stdout_lines }}'
+  ignore_errors: yes

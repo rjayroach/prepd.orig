@@ -3,13 +3,16 @@
     name: terraplate-components/aws/vpc-public-only
   vars:
     name: vpc
+  tags: pro-train-vpc
 
 - include_role:
     name: terraplate-components/aws/bastion-host
   vars:
-    name: vpc
+    name: bastion
+  tags: bastion
 
 - include_role:
     name: terraplate-components/aws/sg-rails
   vars:
     name: sg
+  tags: sg

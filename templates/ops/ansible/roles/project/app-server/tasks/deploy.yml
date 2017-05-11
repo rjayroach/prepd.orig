@@ -1,0 +1,12 @@
+---
+- template:
+    src: envs.j2
+    dest: '{{ project_dir }}/app/.env.deploy.{{ infrastructure_env }}.{{ application_flavor }}'
+
+- name: Deploy the ember application and activate it
+  command: 'ember deploy {{ infrastructure_env }}.{{ application_flavor }} --verbose --activate=true'
+  args:
+    chdir: '{{ project_dir }}/app'
+  register: deploy
+
+- debug: var=deploy

@@ -1,0 +1,82 @@
+#!/usr/bin/env ansible-playbook
+# export TF_VAR_ec2_key_pair_public_key_path=/home/vagrant/terraplate/playbooks/credentials/keys
+# ./provisioner.yml -t pro-train --skip-tags=debug,module,component,resource
+---
+- hosts: provisioner
+  gather_facts: no
+  pre_tasks:
+    # NOTE: This is only intended to be used by a bastion host; For mapping internal instances create a new task
+    # Creating the key and updating ssh config are really two separate tasks
+    # The task to update ssh config could be done against the bastion host in a separate play
+    - include_role:
+        name: terraplate
+        tasks_from: host-ssh
+      vars:
+        host: '{{ mfwa_instance_pro_train_bastion_route53_record.tfvars.name }}'
+        private_key_path: '{{ ssh_dir }}/{{ mfwa_instance_pro_train_bastion_route53_record.tfvars.name }}'
+        subnets:
+          - '{{ mfwa_instance_pro_train_vpc_vpc_subnet_private.tfvars.cidr_block }}'
+          - '{{ mfwa_instance_pro_train_vpc_vpc_subnet_public.tfvars.cidr_block }}'
+      tags: ssh
+    - include_role:
+        name: terraplate
+        tasks_from: get-current-ip
+      tags: get-ip
+
+- hosts: provisioner
+  gather_facts: no
+  roles:
+    - { role: terraplate/package, tags: [always], name: 'mfwa' }
+    # Generate Terraform templates for subdomains (rl.staging.re.com, rl.development.re.com and rl.re.com)
+    - { role: terraplate-components/aws/subdomain, tags: [dns], ns: 'dns', name: 'domain' }
+
+- hosts: provisioner
+  gather_facts: no
+  tags: pro-train
+  vars:
+    - ns: pro-train
+  pre_tasks:
+    - include_role:
+        name:  provisioner
+        tasks_from: vpc
+  roles:
+    # - { role: terraplate-components/aws/vpn, tags: [pro-train], name: 'vpn' }
+
+- hosts: provisioner
+  gather_facts: no
+  tags: processor, processor-alb
+  vars:
+    - ns: processor
+  pre_tasks:
+    - include_role:
+        name:  provisioner
+        tasks_from: app
+  roles:
+    # - { role: terraplate-components/aws/rds-and-subnet, tags: [processor], name: 'database' }
+
+    # - hosts: provisioner
+    #   tags: training
+    #   vars:
+    #     - ns: training
+    #   pre_tasks:
+    #     - include_role:
+    #         name:  provisioner
+    #         tasks_from: app
+    # 
+    # - hosts: provisioner
+    #   tags: sales-vpc
+    #   vars:
+    #     ns: sales
+    #   pre_tasks:
+    #     - include_role:
+    #         name:  provisioner
+    #         tasks_from: vpc
+    # 
+    # - hosts: provisioner
+    #   tags: sales
+    #   vars:
+    #     ns: sales
+    #   tasks:
+    #     - include_role:
+    #         name:  provisioner
+    #         tasks_from: app

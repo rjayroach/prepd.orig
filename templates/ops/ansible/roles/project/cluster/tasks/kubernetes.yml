@@ -1,0 +1,27 @@
+---
+# If app is container(s) being installed on a vanilla k8s cluster then this file would not do anything
+# However, if app has a dedicated k8s cluster then this file might configure that cluster
+# This could also be used to configure ~/.kubectl if it needs commnds run on remote host
+# For now it is just installing docker on staging server to run the app docker container
+# NOTE: The configuration strategy must match the infra strategy if app is not directly responsible for provisioning the infrastructure
+
+# TODO: If packages need to be installed or configuration applied then there are probably multiple roles here
+# However, if this is just deploying k8s dashboard and/or prometheus and other tools then it probably runs against localhost
+# which runs kubectl to generate pods (?) and deploy them
+- name: List clusters
+  command: 'kops get cluster --state s3://{{ provision.cluster_state_bucket }}'
+  register: cluster_list
+
+- name: Create cluster configuration
+  command: 'kops create cluster {{ cluster_name }} --state s3://{{ provision.cluster_state_bucket }} --zones {{ cluster_zones }} --out={{ component_dir }} --target=terraform'
+  when: cluster_list.stdout.find(cluster_name) == -1
+
+# NOTE: Currently running kops create already generates ~/.kube/config so this task isn't necessary
+# - name: Export cluster config
+#   command: 'kops export kubecfg {{ cluster_name }} --state s3://{{ provision.cluster_state_bucket }}'
+
+- name: Remove provider from generated template
+  replace:
+    dest: '{{ component_dir }}/kubernetes.tf'
+    regexp: "provider \"aws\" {\n  region = \"{{ region }}\"\n}\n\n"
+    replace: ''

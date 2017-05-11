@@ -1,0 +1,28 @@
+#!/usr/bin/env ansible-playbook
+---
+- hosts: dev-servers
+  vars_files: ['{{ credentials_dir }}/developer.yml']
+  tags: config
+  pre_tasks:
+    - include_role:
+        name: dev-server
+        tasks_from: config
+  roles:
+    - { role: prepd/ruby,  version: '{{ ruby_version }}' }
+
+- hosts: dev-servers
+  vars_files: ['{{ credentials_dir }}/developer.yml']
+  tags: deploy
+  tasks:
+    - include_role:
+        name: dev-server
+        tasks_from: deploy
+
+- hosts: dev-servers:&local
+  tags: config
+  roles:
+    - { role: prepd/circleci, tags: [config], projects: '{{ circleci_projects }}' }
+    - prepd/prepd
+    - prepd/prepd-tools
+    # - ember
+    # - { role: prepd/nodejs, nodejs_version: '6.9.0' }

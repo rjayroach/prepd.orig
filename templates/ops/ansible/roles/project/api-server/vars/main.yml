@@ -1,0 +1,52 @@
+# api-server/vars/main.yml
+---
+application_name: app
+flavor_dir: '{{ ansible_env.HOME }}/{{ application_flavor }}'
+container_registry: quay_io
+image_name: quay.io/example/app-api
+image_tag: develop
+
+defaults:
+  DATABASE_TEST: api_test
+  INFRASTRUCTURE_ENV: '{{ infrastructure_env }}'
+  APPLICATION_FLAVOR: '{{ application_flavor }}'
+  DATABASE_NAME: '{{ application_name }}_{{ application_flavor }}_{{ infrastructure_env }}'
+  ARTEFACT_ROOT: /data
+  DATABASE_HOST: db
+  DATABASE_USERNAME: override
+  DATABASE_PASSWORD: abcd1234
+  REDIS_URL: redis:6379/1
+
+  # local:
+  #   ARTEFACT_ROOT: /home/vagrant/prepd/data/app
+  #   DATABASE_HOST: localhost
+  #   DATABASE_USERNAME: vagrant
+  #   REDIS_URL: redis:6379/1
+  # 
+  # development:
+  #   ARTEFACT_ROOT: /home/admin/prepd/data/app
+  #   DATABASE_HOST: localhost
+  #   DATABASE_USERNAME: admin
+  #   REDIS_URL: redis:6379/1
+  #
+  # staging:
+  #   ARTEFACT_ROOT: /data
+  #   DATABASE_HOST: db
+  #   # DATABASE_USERNAME: vagrantu
+  #   DATABASE_USERNAME: override
+  #   DATABASE_PASSWORD: abcd1234
+  #   REDIS_URL: redis:6379/1
+  #   SFTP_KEY: /data/kiteworks_id_rsa
+  # 
+  # production:
+  #   ARTEFACT_ROOT: /data
+  #   DATABASE_HOST: db
+  #   DATABASE_USERNAME: vagrant
+  #   REDIS_URL: redis:6379/1
+  #   SFTP_KEY: /data/kiteworks_id_rsa
+
+
+current: "{{ hostvars[inventory_hostname]['api_server_' + application_flavor] | default({})}}"
+vault_current: "{{ hostvars[inventory_hostname]['api_server_' + infrastructure_env + '_vault'] }}"
+vault_defaults: '{{ api_server_defaults_vault }}'
+tf_rds: "{{ hostvars[inventory_hostname]['tf_app_' + application_flavor + '_rds'] | default({}) }}"

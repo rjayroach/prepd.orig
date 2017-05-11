@@ -1,0 +1,62 @@
+#!/usr/bin/env ansible-playbook
+# This playbook generates the components and tfvars to deploy a k8s cluster
+# NOTE: Kops is the 'component' even though it generates a bunch of self contained TF files
+# TODO: Create provisioner/kops role that will:
+# - be able to pass in the cluster name so there can be multiple clusters per infrastructur_env
+# - Generate the necessary sub-domain: k8s in the already created sub-domain staging.example.com (Is this really necessary?)
+# - tgp and tga to provision the infrastructure then launch the k8s dashboard into the cluster; then deploy the container into the infra
+# - Generate the RDS component and tfvars for the cluster
+# - tgp and tga to provision the rds infrastructure
+# - test tgaa to provision dns, rds and the kops infrastructure all in one go
+
+# TODO: Implement to simulate CI/CD on the local cluster first before implementing with circleci for staging
+# - clusters are named after the environment plus number, e.g. staging0, staging1, just like nodes
+# - ~/.kube/config will have multiple clusters, e.g. staging0, etc
+# TODO: playbook uses command: kubectl to deploy the container into the cluster, setting the kubectl cluster name first
+# TODO: maybe config for cluster should launch the manager and prometheus containers whereas
+# this playbook is only concerned with the application's related k8s pods, secrets, etc
+---
+- hosts: provisionerx
+  pre_tasks:
+
+        # provider: default
+        # region: ap-southeast-1
+        # cluster_zones: ap-southeast-1a
+        # cluster_name: 'c1.{{ infrastructure_env }}.{{ provision.tf_domain }}'
+        # cluster_name_h: 'c1-{{ infrastructure_env }}.{{ provision.tf_domain }}'
+
+        # provider: govcloud
+        # region: us-gov-west-1
+        # cluster_zones: us-gov-west-1a
+        # cluster_name: 'c1.{{ infrastructure_env }}.{{ mfwa_global.domain }}'
+        # cluster_name_h: 'c1.{{ provision.tf_domain }}'
+
+- hosts: provisioner
+  gather_facts: no
+  tags: debug, config
+  vars:
+    - provider: default
+  tasks:
+    - include_vars: 
+        file: '{{ credentials_dir }}/aws/terraform.yml'
+        name: creds_array
+    - set_fact:
+        creds: "{{ creds_array['terraform_' + provider] }}"
+    - debug: var=creds
+
+
+- hosts: provisioner
+  tags: config
+  vars:
+    - service: cluster
+    - resource: '{{ cluster_name }}'
+    - provision:
+        cluster_state_bucket: com-example-cluster-state
+  environment: # See: http://docs.ansible.com/ansible/playbooks_environment.html
+    AWS_ACCESS_KEY_ID: "{{ creds['aws_access_key_id'] }}"
+    AWS_SECRET_ACCESS_KEY: "{{ creds['aws_secret_access_key'] }}"
+  tasks:
+    - set_fact:
+    - include_role:
+        name: cluster
+        tasks_from: kubernetes
