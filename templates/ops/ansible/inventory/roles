@@ -24,4 +24,36 @@ tag_Role_worker
 tag_Role_etcd
 
 
-### Application Roles
+# VPC types
+[tag_Vpc_pro_train]
+
+[pro-train:children]
+tag_Vpc_pro_train
+
+
+[tag_Vpc_sales]
+
+[vpc-sales:children]
+tag_Vpc_sales
+
+
+# Role
+[tag_Role_api_server_yes]
+
+[api-servers:children]
+tag_Role_api_server_yes
+
+[tag_Role_app_server_yes]
+
+[app-servers:children]
+tag_Role_app_server_yes
+
+[tag_Role_dev_server_yes]
+
+[dev-servers:children]
+tag_Role_dev_server_yes
+
+[tag_Role_bastion_host_yes]
+
+[bastion-hosts:children]
+tag_Role_bastion_host_yes
