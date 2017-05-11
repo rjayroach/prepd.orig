@@ -1,0 +1,27 @@
+# group_vars/all/prepd.yml
+# NOTE: System vars - Change these values with care!
+# pre-requisites: prepd_dir, project_name and application_dir
+#   are defined in the project's group_vars/all/project.yml
+---
+### Global directory values
+data_dir: '{{ prepd_dir }}/data'
+credentials_dir: '{{ prepd_dir }}/credentials'
+
+
+### Project directory values (outside of project_root)
+app_data_dir: '{{ data_dir }}/{{ project_name }}'
+cert_dir: '{{ data_dir }}/cert'
+
+app_credentials_dir: '{{ credentials_dir }}/{{ project_name }}'
+ssh_dir: '{{ app_credentials_dir }}/keys'
+
+
+### Project directory values (inside of project_root)
+ansible_dir: '{{ playbook_dir }}'
+kubernetes_dir: '{{ playbook_dir.split("/")[0:-1] | join("/") }}/kubernetes'
+terraform_dir: '{{ playbook_dir.split("/")[0:-1] | join("/") }}/terraform'
+
+# TODO: Move to terraplate/package
+tf_components_dir: '{{ terraform_dir }}/components'
+tf_instances_dir: '{{ terraform_dir }}/instances'
+tf_resources_dir: '{{ terraform_dir }}/resources'

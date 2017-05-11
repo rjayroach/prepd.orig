@@ -1,0 +1,6 @@
+#!/usr/bin/env ansible-playbook
+---
+- hosts: provisioner
+  vars_files: ['project.yml']
+  roles:
+    - project

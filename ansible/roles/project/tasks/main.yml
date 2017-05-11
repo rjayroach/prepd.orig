@@ -1,0 +1,72 @@
+# Create a new project with the basic files in place
+# Clone the dependent role repositories
+# Initialize the git repository and setup the remote 'origin'
+---
+- set_fact:
+    credentials_dir: "{{ extern_dir }}/credentials/{{ project.name }}"
+    data_dir: "{{ extern_dir }}/data/{{ project.name }}"
+    template_dir: "{{ prepd_dir }}/templates"
+
+- name: Create project directories
+  file:
+    path: '{{ item }}'
+    state: directory
+  with_items:
+    - '{{ credentials_dir }}'
+    - '{{ data_dir }}'
+    - '{{ target_dir }}'
+
+- name: Create links to external directories for credentials and data
+  file:
+    src: '{{ item.src }}'
+    dest: '{{ project_dir }}/{{ item.dest }}'
+    state: link
+  with_items:
+    - { src: '{{ credentials_dir }}', dest: credentials }
+    - { src: '{{ data_dir }}', dest: data }
+
+- name: Copy files
+  copy:
+    src: '{{ template_dir }}/ops/'
+    dest: '{{ target_dir }}'
+
+- name: Create ansible.cfg
+  template:
+    src: ansible.cfg.j2
+    dest: '{{ target_dir }}/ansible/ansible.cfg'
+
+- name: Create project.yml
+  template:
+    src: project.yml.j2
+    dest: '{{ target_dir }}/ansible/group_vars/all/project.yml'
+
+- name: Create vault password file
+  template:
+    src: vault-password.txt.j2
+    dest: '{{ credentials_dir }}/vault-password.txt'
+
+- name: Inialize git repostiory
+  command: '{{ item }}'
+  args:
+    chdir: '{{ target_dir }}'
+  with_items:
+    - git init
+    - 'git remote add origin {{ git_origin }}'
+
+- name: Clone dependent roles
+  command: 'git submodule add {{ item.repo }} {{ item.location }}'
+  args:
+    chdir: '{{ target_dir }}'
+    creates: '{{ item.location }}'
+  with_items:
+    - { repo: 'git@github.com:rjayroach/prepd-roles.git', location: 'ansible/roles/community/prepd' }
+    - { repo: 'git@github.com:rjayroach/terraplate.git', location: 'ansible/roles/community/terraplate' }
+    - { repo: 'git@github.com:rjayroach/terraplate-components.git', location: 'ansible/roles/community/terraplate-components' }
+
+- name: Add files and make first commit
+  command: '{{ item }}'
+  args:
+    chdir: '{{ target_dir }}'
+  with_items:
+    - git add .
+    - git commit -m 'first commit from prepd'

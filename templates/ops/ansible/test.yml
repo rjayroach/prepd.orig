@@ -2,12 +2,17 @@
 ---
 - hosts: provisioner
   tasks:
+    - debug: var=project_name
+    - debug: var=infrastructure_env
     - debug: var=playbook_dir
     - debug: var=ansible_dir
     - debug: var=prepd_dir
-    - debug: var=infrastructure_env
-    - debug: var=tf_dir
     - debug: var=credentials_dir
+    - debug: var=app_credentials_dir
+    - debug: var=data_dir
+    - debug: var=app_data_dir
+    - debug: var=kubernetes_dir
+    - debug: var=tf_dir
     - include_role:
         name:  prepd/prepd
         tasks_from: test

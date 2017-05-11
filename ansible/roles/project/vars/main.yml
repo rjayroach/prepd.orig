@@ -1,0 +1,7 @@
+---
+# NOTE: override extern_dir if it is not the same as prepd_dir
+extern_dir: "{{ inventory_dir.split('/')[0:-1] | join('/') }}"
+prepd_dir: "{{ inventory_dir.split('/')[0:-1] | join('/') }}"
+project_dir: '{{ project.parent_dir }}/{{ project.name }}'
+target_dir: '{{ project.parent_dir }}/{{ project.name }}/{{ project.ops_dir }}'
+git_origin: '{{ git.user }}:{{ git.account }}/{{ git.repository }}.git'
