@@ -1,11 +1,8 @@
 # http://stackoverflow.com/questions/5533050/gitignore-exclude-folder-but-include-specific-subfolder/
 .vagrant/
 .DS_Store
-/apps/
 /data/*
 !data/.keep
 /credentials/*
 !credentials/README.md
-ansible/group_vars/*/tf_*
-.terraform/
-*.tfvars
+ansible/new-project.yml
