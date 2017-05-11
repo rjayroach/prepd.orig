@@ -14,7 +14,7 @@
   with_items:
     - '{{ credentials_dir }}'
     - '{{ data_dir }}'
-    - '{{ target_dir }}'
+    - '{{ project_dir }}'
 
 - name: Create links to external directories for credentials and data
   file:
@@ -26,9 +26,7 @@
     - { src: '{{ data_dir }}', dest: data }
 
 - name: Copy files
-  copy:
-    src: '{{ template_dir }}/ops/'
-    dest: '{{ target_dir }}'
+  command: 'cp -a {{ template_dir }}/ops {{ project_dir }}'
 
 - name: Create ansible.cfg
   template:
@@ -45,6 +43,12 @@
     src: vault-password.txt.j2
     dest: '{{ credentials_dir }}/vault-password.txt'
 
+- name: Add git
+  apt:
+    name: git
+    state: present
+  become: yes
+
 - name: Inialize git repostiory
   command: '{{ item }}'
   args:
@@ -52,6 +56,15 @@
   with_items:
     - git init
     - 'git remote add origin {{ git_origin }}'
+
+- name: Ignore ssh host check for github.com
+  blockinfile:
+    create: yes
+    dest: '{{ ansible_env.HOME }}/.ssh/config'
+    marker: '# {mark} ANSIBLE MANAGED BLOCK (ignore-gh)'
+    block: |
+      Host github.com
+        StrictHostKeyChecking no
 
 - name: Clone dependent roles
   command: 'git submodule add {{ item.repo }} {{ item.location }}'

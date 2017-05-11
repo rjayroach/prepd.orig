@@ -4,16 +4,11 @@
 #   are defined in the project's group_vars/all/project.yml
 ---
 ### Global directory values
-data_dir: '{{ prepd_dir }}/data'
-credentials_dir: '{{ prepd_dir }}/credentials'
-
-
-### Project directory values (outside of project_root)
-app_data_dir: '{{ data_dir }}/{{ project_name }}'
+data_dir: '{{ project_dir }}/data'
 cert_dir: '{{ data_dir }}/cert'
 
-app_credentials_dir: '{{ credentials_dir }}/{{ project_name }}'
-ssh_dir: '{{ app_credentials_dir }}/keys'
+credentials_dir: '{{ project_dir }}/credentials'
+ssh_dir: '{{ credentials_dir }}/keys'
 
 
 ### Project directory values (inside of project_root)

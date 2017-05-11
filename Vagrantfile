@@ -1,16 +1,4 @@
-# TODO: prepd is a directory in prepd-project that can be invoked with cli as well
 ssh_intf = 'eth1'
-def invoke_prepd?
-  ARGV[0].eql?('up') and File.exist?('prepd.rb')
-end
-
-if invoke_prepd?
-  require_relative 'prepd'
-  project = Prepd::Project.new
-  project.create if not Dir.exist?('ansible/roles')
-  project.clone_submodules if not Dir.exist?('ansible/roles/prepd')
-  project.copy_developer_yml
-end
 
 Vagrant.configure(2) do |config|
   host_name = Dir.pwd.split('/').pop(2).reverse.join('.')
@@ -66,15 +54,6 @@ Vagrant.configure(2) do |config|
         node.vm.network 'forwarded_port', guest: 7357, host: 7357, auto_correct: true    #
         # node.vm.network 'forwarded_port', guest: 35729, host: 35729, auto_correct: true  # reload
         node.vm.network 'forwarded_port', guest: 49152, host: 49152, auto_correct: true  # live-reload
-      end
-
-      # Configuration
-      node.vm.provision :ansible_local do |ansible|
-        ansible.install = false
-        ansible.playbook = 'infra-config.yml'
-        ansible.provisioning_path = "/home/vagrant/#{project_name}/ansible"
-        ansible.inventory_path = 'inventory/local'
-        ansible.limit = "node#{i}.local"
       end
     end
   end

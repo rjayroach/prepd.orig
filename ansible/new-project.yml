@@ -1,6 +1,13 @@
 #!/usr/bin/env ansible-playbook
 ---
 - hosts: provisioner
-  vars_files: ['project.yml']
+  vars:
+    project:
+      parent_dir: '{{ ansible_env.HOME }}'
+      name: checkout
+    git:
+      user: git@github.com
+      account: maxcole
+      repository: ptest
   roles:
     - project
