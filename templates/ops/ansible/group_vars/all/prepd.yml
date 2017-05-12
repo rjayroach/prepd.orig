@@ -8,6 +8,7 @@ data_dir: '{{ project_dir }}/data'
 cert_dir: '{{ data_dir }}/cert'
 
 credentials_dir: '{{ project_dir }}/credentials'
+credentials_file: '{{ credentials_dir }}/developer.yml'
 ssh_dir: '{{ credentials_dir }}/keys'
 
 

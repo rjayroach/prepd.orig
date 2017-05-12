@@ -38,7 +38,7 @@
 ### Deploy plays
 # - hosts: api-servers
 #   tags: deploy, deploy-training, deploy-processor, deploy-sales
-#   vars_files: ['{{ credentials_dir }}/developer.yml']
+#   vars_files: ['{{ credentials_file }}']
 #   tasks:
 #     - include_role:
 #         name: api-server

@@ -9,10 +9,16 @@
     name: prepd/yadr
 
 - include_role:
-    name: prepd/developer
+    name: prepd/awscli
+
+- include_role:
+    name: prepd/credentials
 
 - include_role:
     name: prepd/developer-tools
+
+- include_role:
+    name: prepd/tmuxinator
 
 - include_role:
     name: prepd/git

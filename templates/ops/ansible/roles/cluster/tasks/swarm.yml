@@ -2,7 +2,7 @@
 # The idea is to reuse the compose definition in container.yml but deploy to a swarm cluster
 ---
 - hosts: master:&swarm
-  vars_files: ['{{ credentials_dir }}/developer.yml']
+  vars_files: ['{{ credentials_file }}]
 
   tasks:
     - include: container.yml image_tag='develop'

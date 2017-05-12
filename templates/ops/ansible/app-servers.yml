@@ -30,7 +30,7 @@
 ###
 - hosts: provisioner
   tags: deploy
-  vars_files: ['{{ credentials_dir }}/developer.yml']
+  vars_files: ['{{ credentials_file }}']
   vars:
     # TODO: Get the IP from the hostvars lookup
     - username: admin

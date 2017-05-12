@@ -9,14 +9,13 @@
     # Creating the key and updating ssh config are really two separate tasks
     # The task to update ssh config could be done against the bastion host in a separate play
     - include_role:
-        name: terraplate
-        tasks_from: host-ssh
+        name: prepd/ssh
       vars:
         host: '{{ mfwa_instance_pro_train_bastion_route53_record.tfvars.name }}'
         private_key_path: '{{ ssh_dir }}/{{ mfwa_instance_pro_train_bastion_route53_record.tfvars.name }}'
         subnets:
-          - '{{ mfwa_instance_pro_train_vpc_vpc_subnet_private.tfvars.cidr_block }}'
-          - '{{ mfwa_instance_pro_train_vpc_vpc_subnet_public.tfvars.cidr_block }}'
+          - { block: '{{ mfwa_instance_pro_train_vpc_vpc_subnet_private.tfvars.cidr_block }}', key: '{{ ssh_dir }}/id_rsa' }
+          - { block: '{{ mfwa_instance_pro_train_vpc_vpc_subnet_public.tfvars.cidr_block }}', key: '{{ ssh_dir }}/id_rsa' }
       tags: ssh
     - include_role:
         name: terraplate
