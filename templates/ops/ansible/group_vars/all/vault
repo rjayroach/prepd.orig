@@ -1,6 +1,0 @@
-# inventory/group_vars/all/vault
----
-default_api_all_vault:
-  ALL_VAULT_VAR: 'find me in group_vars/all/vault'
-default_app_all_vault:
-  ALL_VAULT_VAR: 'find me in group_vars/all/vault'

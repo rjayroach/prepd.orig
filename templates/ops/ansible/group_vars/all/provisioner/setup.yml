@@ -1,0 +1,17 @@
+# group_vars/all/provisioner/setup.yml
+# export TF_VAR_ec2_key_pair_public_key_path=/home/vagrant/fanclubs/credentials/keys
+# export TF_VAR_s3_template_file_credentials_path=/home/vagrant/webapp
+---
+# Variables for provisioner setup
+setup:
+  roles: [app-server, api-server, dev-server, db-server]
+  ec2_ini:
+    default:
+      regions: [ap-southeast-1]
+      vpc_destination_variable: ip_address #  private_ip_address
+      destination_variable: public_dns_name #  private_dns_name
+      boto_profile: taggo
+    development: {}
+    staging: {}
+    production:
+      regions: [ap-southeast-1]

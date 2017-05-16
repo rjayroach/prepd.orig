@@ -1,0 +1,12 @@
+---
+- include_role:
+    name: prepd/credentials
+
+- include_role:
+    name: prepd/developer-tools
+
+- include_role:
+    name: prepd/circleci
+  vars:
+    projects: '{{ circleci_projects }}'
+  when: "'circleci' in project_cis"

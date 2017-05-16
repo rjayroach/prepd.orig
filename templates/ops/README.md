@@ -32,8 +32,10 @@ cd ops/ansible
 
 ## Configure Project
 
+```bash
 cd project_dir/ansible
 vi roles/dev-server/vars/main.yml
+```
 
 
 # Applications
@@ -41,20 +43,28 @@ vi roles/dev-server/vars/main.yml
 Each application has it's own namespace which contains subdirectories for ansible, kubernetes and terraform
 
 ```bash
-.
-└── app
-    ├── ansible
-    │   ├── ansible.cfg -> ../../../ansible/ansible.cfg
-    │   ├── config.yml
-    │   ├── deploy.yml
-    │   ├── group_vars
-    │   ├── inventory
-    │   ├── provision.yml
-    │   ├── roles
-    │   ├── test.yml
-    │   └── utils.yml
-    ├── kubernetes
-    └── terraform
-        ├── README.md
-        └── global
+ops
+├── ansible
+│   ├── ansible.cfg
+│   ├── api-servers.yml
+│   ├── app-servers.yml
+│   ├── cluster.yml
+│   ├── community-roles
+│   ├── dev-servers.yml
+│   ├── group_vars
+│   ├── inventory
+│   ├── provisioner.yml
+│   ├── roles
+│   ├── server-infra.yml
+│   ├── test.yml
+│   ├── utils.yml
+│   └── vpc-infra.yml
+├── kubernetes
+├── README.md
+└── terraform
+    ├── components
+    ├── global
+    ├── instances
+    ├── README.md
+    └── resources
 ```

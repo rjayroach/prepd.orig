@@ -2,6 +2,20 @@
 # export TF_VAR_ec2_key_pair_public_key_path=/home/vagrant/terraplate/playbooks/credentials/keys
 # ./provisioner.yml -t pro-train --skip-tags=debug,module,component,resource
 ---
+# The goal here is that the user makes changes here and doesn't have to konw the internals
+# of how ansible manages dynamic inventory
+# after new-project; cd to the project dir and run ./setup-project.yml -t setup
+# this will do stuff like write these values to inventory roles and ec2.ini
+# it must be idempotent so this file can be updated and it will still work
+- hosts: provisioner
+  tags: setup
+
+  roles:
+    - prepd/terraform
+    - prepd/credentials
+    - prepd/prepd-tools
+
+
 - hosts: provisioner
   gather_facts: no
   pre_tasks:

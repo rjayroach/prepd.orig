@@ -4,10 +4,10 @@
   vars:
     project:
       parent_dir: '{{ ansible_env.HOME }}'
-      name: change-me
+      name: otterlog
     git:
       user: git@github.com
-      account: change-me
-      repository: change-me
+      account: speartail
+      repository: otterlog
   roles:
     - project

@@ -1,0 +1,73 @@
+# group_vars/all/multi-flavor-web-app.yml
+---
+application_name: 'ember'
+web_app_dir: '/home/vagrant/ember/ember-web'
+# export TF_VAR_ec2_key_pair_public_key_path=/home/vagrant/terraplate/playbooks/credentials/keys
+# export TF_VAR_s3_template_file_credentials_path=/home/vagrant/webapp
+
+# TODO: add these under package namespace
+mfwa_global:
+  aws_region: ap-southeast-1
+  domain: example.com
+
+mfwa_package:
+  directory: multi-flavor-web-app
+  remote_state:
+    bucket: com-example-terraform-state
+    region: ap-southeast-1
+  provider:
+    credential: default
+    region: ap-southeast-1
+
+# Applies to all instances of this specific Resource
+# mfwa_resource_vpc_subnet:
+#   xtfvars:
+#     cidr_block: 192.168.1.0/24
+
+# Applies to all instances of this specific Component
+# mfwa_component_vpc_public_only:
+#   provider:
+#     credential: gov-cloud
+#     region: us-gov-west-1
+
+
+### Subdomain
+mfwa_instance_dns_domain:
+  remote_states:
+    domain: 'global/subdomains/{{ infrastructure_env }}'
+
+mfwa_module_support_subdomain_route53_subdomain:
+  tfvars:
+    name: 'rl.{{ infrastructure_env }}.{{ mfwa_global.domain }}'
+    name_h: 'rl-{{ infrastructure_env }}.{{ mfwa_global.domain }}'
+
+
+### 'pro-train' VPC
+# Applies to this specific instance of this specific Module within this specific Component
+mfwa_instance_pro_train_vpc_vpc_vpc:
+  tfvars:
+    cidr_block: 172.16.0.0/20
+    tags:
+      Name: pro-train
+
+mfwa_instance_pro_train_vpc_vpc_subnet_private:
+  tfvars:
+    availability_zone: ap-southeast-1a
+    cidr_block: 172.16.0.0/24
+    tags:
+      Name: '{{ mfwa_instance_pro_train_vpc_vpc_vpc.tfvars.tags.Name }}-subnet-private'
+
+mfwa_instance_pro_train_vpc_vpc_subnet_private_2:
+  tfvars:
+    availability_zone: ap-southeast-1b
+    cidr_block: 172.16.2.0/24
+    tags:
+      Name: '{{ mfwa_instance_pro_train_vpc_vpc_vpc.tfvars.tags.Name }}-subnet-private-2'
+
+mfwa_instance_pro_train_vpc_vpc_subnet_public:
+  tfvars:
+    availability_zone: ap-southeast-1a
+    cidr_block: 172.16.1.0/24
+    tags:
+      Name: '{{ mfwa_instance_pro_train_vpc_vpc_vpc.tfvars.tags.Name }}-subnet-public'
+

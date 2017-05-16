@@ -1,0 +1,33 @@
+---
+- name: Dump databases
+  include_role:
+    name: prepd/mysql
+    tasks_from: db-dump
+  vars:
+    mysql_user_name: '{{ database_user }}'
+    mysql_user_password: '{{ database_password_vault }}'
+  when: mysql_databases | length > 0
+
+# TODO: add dump for postgres databases
+# Perhaps the archive and compress functions will move to MySQL role
+# b/c PG already has a compression feature built in
+
+- name: Archive the dump files
+  command: 'tar -cf {{ item }}.sql.tar {{ item }}.sql'
+  args:
+    chdir: /tmp
+
+- name: Compress dump files
+  archive:
+    path: '/tmp/{{ item }}.sql.tar'
+    dest: '/tmp/{{ item }}.sql.tar.gz'
+  with_items: '{{ mysql_databases }}'
+  when: mysql_databases | length > 0
+
+- name: Copy dump files to the project data_dir on the local machine
+  fetch:
+    src: '/tmp/{{ item }}.sql.gz'
+    dest: '{{ data_dir }}/{{ item }}.sql.gz'
+    flat: yes
+  with_items: '{{ mysql_databases }}' # + postgres_databases }}'
+  when: mysql_databases | length > 0

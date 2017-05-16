@@ -1,0 +1,55 @@
+---
+# Project dependenices variables (dev-servers.yml -t config)
+config:
+  machine:
+    time_zone: 'Asia/Singapore'
+    shell: zsh
+    aliases_file: '{{ ansible_env.HOME }}/.zsh.after/aliases.zsh'
+    tools:
+      - { name: yadr }
+      - { name: awscli }
+      - { name: tmuxinator }
+  databases:
+    - { name: mysql, version: latest, mysql_user_name: '{{ database_user }}', mysql_user_password: '{{ database_password_vault }}' }
+    # - { name: postgresql, version: latest }
+    # - { name: redis, version: latest }
+  languages:
+    - { name: ruby, version: 2.3.0 }
+    - { name: nodejs, version: 6.9.0 }
+  ci:
+    xcircleci:
+      - { provider: 'github', account: 'maxcole', repo: 'tfg' }
+      - { provider: 'github', account: 'maxcole', repo: 'fan_club' }
+
+
+# Variables for deploymet of the project (dev-servers.yml -t deploy)
+git_account: 'git@github.com:maxcole'
+agit_account: 'git@github.com:rjayroach'
+deploy:
+  databases:
+    mysql:
+      - tfg_development
+      - tfg_test
+  # env_apps:
+  #   - { dir: '{{ dev_dir }}/api', envs: '{{ api_server }}' }
+  #   - { dir: '{{ dev_dir }}/app', envs: '{{ web_app }}' }
+  #   #- { dir: '{{ dev_dir }}/app-chat', envs: '{{ app_chat_envs }}' }
+  repos:
+    git:
+      - { account: '{{ git_account }}', name: 'tfg', dir: '{{ dev_dir }}' }
+      - { account: '{{ git_account }}', name: 'fan_club', dir: '{{ dev_dir }}' }
+      - { account: '{{ agit_account }}', name: 'mcp_common', dir: '{{ dev_dir }}' }
+      - { account: '{{ agit_account }}', name: 'dry-auth', dir: '{{ dev_dir }}' }
+      - { account: '{{ agit_account }}', name: 'cache-party', dir: '{{ dev_dir }}' }
+  apps:
+    rails:
+      - { name: 'tfg', dir: '{{ dev_dir }}', bundle: no, migrate: no }
+      - { name: 'fan_club', dir: '{{ dev_dir }}', bundle: no, migrate: no, local: yes }
+      - { name: 'mcp_common', dir: '{{ dev_dir }}', bundle: no, migrate: no, local: yes }
+      - { name: 'dry-auth', dir: '{{ dev_dir }}', bundle: no, migrate: no, local: yes }
+      - { name: 'cache-party', dir: '{{ dev_dir }}', bundle: no, migrate: no, local: yes }
+    ember:
+      # - { name: 'app-web', dir: '{{ dev_dir }}' }
+  tools:
+    tmuxinator:
+      - { name: '{{ project_name }}.yml', src: '{{ dev_dir }}/tfg/.tmuxinator.yml' }

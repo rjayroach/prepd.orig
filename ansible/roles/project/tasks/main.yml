@@ -33,6 +33,11 @@
     src: project.yml.j2
     dest: '{{ target_dir }}/ansible/group_vars/all/project.yml'
 
+- name: Create developer.yml
+  template:
+    src: developer.yml.j2
+    dest: '{{ credentials_dir }}/developer.yml'
+
 - name: Create vault password file
   template:
     src: vault-password.txt.j2

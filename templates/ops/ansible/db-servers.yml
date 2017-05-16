@@ -1,0 +1,15 @@
+#!/usr/bin/env ansible-playbook
+---
+- hosts: db-servers
+  tags: dump
+  tasks:
+    - include_role:
+        name: db-server
+        tasks_from: db-dump
+
+- hosts: db-servers
+  tags: restore
+  tasks:
+    - include_role:
+        name: db-server
+        tasks_from: db-restore

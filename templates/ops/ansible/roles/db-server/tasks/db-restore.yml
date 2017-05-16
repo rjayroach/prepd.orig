@@ -1,0 +1,16 @@
+---
+- name: Copy the dump file to remote machine and uncompress it
+  unarchive:
+    src: '/{{ data_dir }}/{{ item }}.sql.tar.gz'
+    dest: '/tmp' # /{{ item }}.sql'
+  with_items: '{{ mysql_databases }}' # + postgres_databases }}'
+  when: mysql_databases | length > 0
+
+- name: Restore MySQL databases from dump files
+  include_role:
+    name: prepd/mysql
+    tasks_from: db-restore
+  vars:
+    mysql_user_name: '{{ database_user }}'
+    mysql_user_password: '{{ database_password_vault }}'
+  when: mysql_databases | length > 0
