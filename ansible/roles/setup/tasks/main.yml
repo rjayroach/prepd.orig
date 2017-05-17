@@ -1,4 +1,6 @@
 ---
+### Setup inventory directories
+# TODO: Use a variable rather than hardcoded array of [development, staging, production]
 - name: Ensure each inventory directory exists
   file:
     path: '{{ playbook_dir }}/inventory/{{ item }}'
@@ -37,37 +39,70 @@
   with_items: [development, staging, production]
 
 
-#####
+### Setup credentials and data directories
 - name: Check for existence of ~/prepd
   stat:
-    path: '{{ ansible_env.HOME }}/prepd'
+    path: '{{ prepd_dir }}'
   register: prepd
 
-- set_fact:
-    credentials_dir: '{{ ansible_env.HOME }}/prepd/credentials/{{ project_name }}'
-    data_dir: '{{ ansible_env.HOME }}/prepd/data/{{ project_name }}'
+- name: Ensure data and crendentials directories exist in ~/prepd
+  file:
+    path: '{{ prepd_dir }}/{{ item }}/{{ project_name }}'
+    state: directory
+  with_items: [credentials, data]
   when: prepd.stat.isdir
-  # when: prepd.stat.isdir is defined and prepd.stat.isdir
 
-- set_fact:
-    credentials_dir: '{{ project_dir }}/credentials'
-    data_dir: '{{ project_dir }}/data'
-  when: not prepd.stat.isdir
+- name: Create links to data and credentials directories in ~/prepd
+  file:
+    src: '{{ prepd_dir }}/{{ item }}/{{ project_name }}'
+    dest: '{{ project_dir }}/{{ item }}'
+    state: link
+  with_items: [credentials, data]
+  when: prepd.stat.isdir
 
-- name: Ensure each inventory directory exists
+- name: Ensure data and crendentials directories exist
   file:
     path: '{{ item }}'
     state: directory
   with_items:
     - '{{ credentials_dir }}'
     - '{{ data_dir }}'
+  when: not prepd.stat.isdir
 
-- name: Create links to external directories for credentials and data
-  file:
-    src: '{{ item.src }}'
-    dest: '{{ item.dest }}'
-    state: link
+- name: Create developer.yml
+  template:
+    src: developer.yml.j2
+    dest: '{{ credentials_dir }}/developer.yml'
+
+- name: Create vault password file
+  template:
+    src: vault-password.txt.j2
+    dest: '{{ credentials_dir }}/vault-password.txt'
+
+
+### Setup git and submodule dependencies
+- name: Inialize git repostiory
+  command: '{{ item }}'
+  args:
+    chdir: '{{ ops_dir }}'
   with_items:
-    - { src: '{{ credentials_dir }}', dest: '{{ project_dir }}/credentials' }
-    - { src: '{{ data_dir }}', dest: '{{ project_dir }}/data' }
-  when: prepd.stat.isdir
+    - rm -rf .git
+    - git init
+
+- name: Clone dependent roles
+  command: 'git submodule add {{ item.repo }} {{ item.location }}'
+  args:
+    chdir: '{{ ops_dir }}'
+    creates: '{{ item.location }}'
+  with_items:
+    - { repo: 'git@github.com:rjayroach/prepd-roles.git', location: 'ansible/community-roles/prepd' }
+    - { repo: 'git@github.com:rjayroach/terraplate.git', location: 'ansible/community-roles/terraplate' }
+    - { repo: 'git@github.com:rjayroach/terraplate-components.git', location: 'ansible/community-roles/terraplate-components' }
+
+- name: Add files and make first commit
+  command: '{{ item }}'
+  args:
+    chdir: '{{ ops_dir }}'
+  with_items:
+    - git add .
+    - git commit -m 'first commit from prepd'

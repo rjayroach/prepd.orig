@@ -4,6 +4,7 @@
   tags: config
   tasks:
     - debug: var=playbook_dir
+    - debug: var=ops_dir
     - debug: var=infrastructure_env
 
     - debug: var=project_name

@@ -3,6 +3,9 @@
 # pre-requisites: prepd_dir, project_name and application_dir
 #   are defined in the project's group_vars/all/project.yml
 ---
+prepd_dir: '{{ ansible_env.HOME }}/prepd'
+ops_dir: '{{ playbook_dir.split("/")[0:-1] | join("/") }}'
+
 ### Global directory values
 project_name: '{{ playbook_dir.split("/")[-3] }}'
 project_dir: '{{ playbook_dir.split("/")[0:-2] | join("/") }}'
