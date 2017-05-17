@@ -4,6 +4,9 @@
 #   are defined in the project's group_vars/all/project.yml
 ---
 ### Global directory values
+project_name: '{{ playbook_dir.split("/")[-3] }}'
+project_dir: '{{ playbook_dir.split("/")[0:-2] | join("/") }}'
+
 data_dir: '{{ project_dir }}/data'
 cert_dir: '{{ data_dir }}/cert'
 

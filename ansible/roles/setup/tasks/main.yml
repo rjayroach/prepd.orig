@@ -1,17 +1,4 @@
 ---
-- name: Copy playbooks for each role specified in setup.roles
-  copy:
-    src: '{{ item }}s.yml'
-    dest: '{{ playbook_dir }}'
-    mode: 0755
-  with_items: '{{ setup.roles }}'
-
-- name: Copy group vars if they do not exist
-  copy:
-    src: group_vars/
-    dest: '{{ playbook_dir }}/group_vars/'
-    force: no
-
 - name: Ensure each inventory directory exists
   file:
     path: '{{ playbook_dir }}/inventory/{{ item }}'
@@ -28,11 +15,6 @@
     dest: '{{ playbook_dir }}/inventory/{{ item }}/roles'
     state: link
   with_items: [local, development, staging, production]
-
-- copy:
-    src: inventory/ec2.py
-    dest: '{{ playbook_dir }}/inventory/ec2.py'
-    mode: 0755
 
 - name: Softlink the ec2.py file into each inventory directory
   file:
@@ -53,3 +35,39 @@
     dest: '{{ playbook_dir }}/inventory/{{ item }}/hosts'
     force: no
   with_items: [development, staging, production]
+
+
+#####
+- name: Check for existence of ~/prepd
+  stat:
+    path: '{{ ansible_env.HOME }}/prepd'
+  register: prepd
+
+- set_fact:
+    credentials_dir: '{{ ansible_env.HOME }}/prepd/credentials/{{ project_name }}'
+    data_dir: '{{ ansible_env.HOME }}/prepd/data/{{ project_name }}'
+  when: prepd.stat.isdir
+  # when: prepd.stat.isdir is defined and prepd.stat.isdir
+
+- set_fact:
+    credentials_dir: '{{ project_dir }}/credentials'
+    data_dir: '{{ project_dir }}/data'
+  when: not prepd.stat.isdir
+
+- name: Ensure each inventory directory exists
+  file:
+    path: '{{ item }}'
+    state: directory
+  with_items:
+    - '{{ credentials_dir }}'
+    - '{{ data_dir }}'
+
+- name: Create links to external directories for credentials and data
+  file:
+    src: '{{ item.src }}'
+    dest: '{{ item.dest }}'
+    state: link
+  with_items:
+    - { src: '{{ credentials_dir }}', dest: '{{ project_dir }}/credentials' }
+    - { src: '{{ data_dir }}', dest: '{{ project_dir }}/data' }
+  when: prepd.stat.isdir
