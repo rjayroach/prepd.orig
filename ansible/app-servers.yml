@@ -42,8 +42,8 @@
     - root_directory: /srv/www/web-app
   tasks:
     - include_role:
-        name: app-server
-        tasks_from: open-ssh
+        name: prepd/ssh
+        tasks_from: open-tunnel
       tags: deploy, deploy-processor, deploy-training
     - include_role:
         name: app-server
@@ -60,6 +60,6 @@
         api_server_port: 13001
       tags: deploy-training
     - include_role:
-        name: app-server
-        tasks_from: close-ssh
+        name: prepd/ssh
+        tasks_from: close-tunnel
       tags: deploy, deploy-processor, deploy-training

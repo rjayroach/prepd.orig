@@ -1,0 +1,50 @@
+# DO NOT EDIT {{ ansible_managed }}
+### Local Roles
+[tag_Role_master]
+
+[master:children]
+tag_Role_master
+
+{% if setup.kubernetes is defined %}
+### Kubernetes Roles
+[tag_Role_controller]
+
+[controller:children]
+tag_Role_controller
+
+
+[tag_Role_worker]
+
+[worker:children]
+tag_Role_worker
+
+
+[tag_Role_etcd]
+
+[etcd:children]
+tag_Role_etcd
+{% endif %}
+
+
+# VPC types
+[tag_Vpc_pro_train]
+
+[pro-train:children]
+tag_Vpc_pro_train
+
+
+[tag_Vpc_sales]
+
+[vpc-sales:children]
+tag_Vpc_sales
+
+
+# Roles
+{% for role in setup.roles %}
+{% set role_underscore = role | replace('-', '_') %}
+[tag_Role_{{ role_underscore }}_yes]
+
+[{{ role }}s:children]
+tag_Role_{{ role_underscore }}_yes
+
+{% endfor %}

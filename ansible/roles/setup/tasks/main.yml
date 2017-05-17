@@ -1,0 +1,55 @@
+---
+- name: Copy playbooks for each role specified in setup.roles
+  copy:
+    src: '{{ item }}s.yml'
+    dest: '{{ playbook_dir }}'
+    mode: 0755
+  with_items: '{{ setup.roles }}'
+
+- name: Copy group vars if they do not exist
+  copy:
+    src: group_vars/
+    dest: '{{ playbook_dir }}/group_vars/'
+    force: no
+
+- name: Ensure each inventory directory exists
+  file:
+    path: '{{ playbook_dir }}/inventory/{{ item }}'
+    state: directory
+  with_items: [local, development, staging, production]
+
+- template:
+    src: inventory-roles.j2
+    dest: '{{ playbook_dir }}/inventory/roles'
+
+- name: Softlink the roles file into each inventory directory
+  file:
+    src: '../roles'
+    dest: '{{ playbook_dir }}/inventory/{{ item }}/roles'
+    state: link
+  with_items: [local, development, staging, production]
+
+- copy:
+    src: inventory/ec2.py
+    dest: '{{ playbook_dir }}/inventory/ec2.py'
+    mode: 0755
+
+- name: Softlink the ec2.py file into each inventory directory
+  file:
+    src: '../ec2.py'
+    dest: '{{ playbook_dir }}/inventory/{{ item }}/ec2.py'
+    state: link
+  with_items: [development, staging, production]
+
+- name: Template an ec2.ini for each role
+  template:
+    src: ec2.ini.j2
+    dest: '{{ playbook_dir }}/inventory/{{ item }}/ec2.ini'
+  with_items: [development, staging, production]
+
+- name: One time template each inventory hosts file
+  template:
+    src: inventory-hosts.j2
+    dest: '{{ playbook_dir }}/inventory/{{ item }}/hosts'
+    force: no
+  with_items: [development, staging, production]
