@@ -1,6 +1,26 @@
+#!/usr/bin/env ansible-playbook
 ---
 - hosts: provisioner
+  tags: config
   tasks:
-    - set_fact:
-        duh: "{{ inventory_dir.split('/')[0:-1] | join('/') }}"
-    - debug: var=duh
+    - debug: var=playbook_dir
+    - debug: var=infrastructure_env
+
+    - debug: var=project_name
+
+    - debug: var=data_dir
+    - debug: var=credentials_dir
+
+    - debug: var=cert_dir
+
+    - debug: var=ssh_dir
+
+    - debug: var=ansible_dir
+    - debug: var=kubernetes_dir
+    - debug: var=terraform_dir
+
+    # - include_role:
+    #     name:  prepd/prepd
+    #     tasks_from: test
+    #   vars:
+    #       test: success!

@@ -1,0 +1,6 @@
+---
+- hosts: provisioner
+  tasks:
+    - set_fact:
+        duh: "{{ inventory_dir.split('/')[0:-1] | join('/') }}"
+    - debug: var=duh
