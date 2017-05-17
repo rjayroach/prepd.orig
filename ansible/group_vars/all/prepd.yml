@@ -10,6 +10,7 @@ ops_dir: '{{ playbook_dir.split("/")[0:-1] | join("/") }}'
 project_name: '{{ playbook_dir.split("/")[-3] }}'
 project_dir: '{{ playbook_dir.split("/")[0:-2] | join("/") }}'
 
+dev_dir: '{{ project_dir }}/dev'
 data_dir: '{{ project_dir }}/data'
 cert_dir: '{{ data_dir }}/cert'
 

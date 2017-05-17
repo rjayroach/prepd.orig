@@ -1,33 +1,12 @@
-# group_vars/app/deploy.yml
-# These variables support deployment of the development artifacts
-# There are currently no variables that are specific to deployments in any other environment
 ---
-circleci_projects:
-  - { provider: 'github', account: 'example', repo: 'app-api' }
-  - { provider: 'github', account: 'example', repo: 'app-web' }
+# config vars
+config_databases: "{{ config.databases | map(attribute='name') | list }}"
+config_languages: "{{ config.languages | map(attribute='name') | list }}"
 
-databases:
-  - { name: '{{ api_server.DATABASE_NAME }}', password: '{{ api_server.DATABASE_PASSWORD }}' }
-  - { name: '{{ api_server.DATABASE_TEST }}', password: '{{ api_server.DATABASE_PASSWORD }}' }
+machine_tools: "{{ config.machine.tools | map(attribute='name') | list }}"
+project_cis: '{{ config.ci.keys() }}'
 
-env_apps:
-  - { dir: '{{ project_dir }}/api', envs: '{{ api_server }}' }
-  - { dir: '{{ project_dir }}/app', envs: '{{ web_app }}' }
-  #- { dir: '{{ project_dir }}/app-chat', envs: '{{ app_chat_envs }}' }
-
-git_account: 'git@github.com:example'
-git_repos:
-  - { account: '{{ git_account }}', repo: 'app-api', dir: '{{ project_dir }}', name: 'api' }
-  - { account: '{{ git_account }}', repo: 'app-web', dir: '{{ project_dir }}', name: 'app' }
-  #- { account: '{{ git_account }}', name: 'app-chat', dir: '{{ project_dir }}' }
-
-ember_apps:
-  - { name: 'app-web', dir: '{{ project_dir }}' }
-
-ruby_version: 2.3.0
-
-rails_apps:
-  - { name: 'app-api', dir: '{{ project_dir }}', bundle: yes, migrate: yes }
-
-tmuxinator_files:
-  - { name: 'app.yml', src: '{{ project_dir }}/app-api/.tmuxinator.yml' }
+# deploy vars
+project_apps: '{{ deploy.apps.keys() }}'
+deploy_databases: '{{ deploy.databases.keys() }}'
+# deploy_databases: "{{ deploy.databases | map(attribute='name') | list }}"

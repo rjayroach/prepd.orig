@@ -5,14 +5,14 @@
   tags: config
   tasks:
     - include_role:
-        name: prepd/dev-server
+        name: dev-server
         tasks_from: config-local
 
 - hosts: dev-servers
   tags: config
   tasks:
     - include_role:
-        name: prepd/dev-server
+        name: dev-server
         tasks_from: config
 
 
@@ -21,12 +21,12 @@
   tags: deploy
   tasks:
     - include_role:
-        name: prepd/dev-server
+        name: dev-server
         tasks_from: deploy-local
 
 - hosts: dev-servers
   tags: deploy
   tasks:
     - include_role:
-        name: prepd/dev-server
+        name: dev-server
         tasks_from: deploy

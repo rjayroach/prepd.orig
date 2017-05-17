@@ -1,32 +1,42 @@
 # dev-server/tasks/deploy
 ---
 - include_role:
-    name: prepd/git-repos
+    name: prepd/mysql
+    tasks_from: deploy
   vars:
-    repos: '{{ git_repos }}'
+    mysql_databases: '{{ deploy.databases.mysql }}'
+  when: "'mysql' in deploy_databases"
 
 - include_role:
-    name: prepd/env
+    name: prepd/git
+    tasks_from: repos
   vars:
-    apps: '{{ env_apps }}'
-
-- include_role:
-    name: prepd/postgres-utils
-  vars:
-    action: 'create-databases'
-    postgres_databases: '{{ databases }}'
-
+    repos: '{{ deploy.repos.git }}'
+#
+# - include_role:
+#     name: prepd/env
+#   vars:
+#     apps: '{{ env_apps }}'
+# 
+# - include_role:
+#     name: prepd/postgres-utils
+#   vars:
+#     action: 'create-databases'
+#     postgres_databases: '{{ databases }}'
+ 
 - include_role:
     name: prepd/rails
   vars:
-    apps: '{{ rails_apps }}'
+    apps: '{{ deploy.apps.rails }}'
+  when: "'rails' in project_apps"
 
-- include_role:
-    name: prepd/ember
-  vars:
-     apps: '{{ ember_apps }}'
+# - include_role:
+#     name: prepd/ember
+#   vars:
+#      apps: '{{ ember_apps }}'
 
 - include_role:
     name: prepd/tmuxinator
+    tasks_from: deploy
   vars:
-    files: '{{ tmuxinator_files }}'
+    files: '{{ deploy.tools.tmuxinator }}'
