@@ -48,7 +48,7 @@
 - hosts: provisioner
   tags: config
   vars:
-    - service: cluster
+    - service: prepd/cluster
     - resource: '{{ cluster_name }}'
     - provision:
         cluster_state_bucket: com-example-cluster-state
@@ -58,5 +58,5 @@
   tasks:
     - set_fact:
     - include_role:
-        name: cluster
+        name: prepd/cluster
         tasks_from: kubernetes

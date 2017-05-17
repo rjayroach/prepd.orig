@@ -1,8 +1,0 @@
-# This file hasn't been tested. It is here to show an alternative installation to k8s which is docker-swarm
-# The idea is to reuse the compose definition in container.yml but deploy to a swarm cluster
----
-- hosts: master:&swarm
-  vars_files: ['{{ credentials_file }}]
-
-  tasks:
-    - include: container.yml image_tag='develop'

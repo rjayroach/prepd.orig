@@ -6,8 +6,7 @@
     - key: terraform_default
   tasks:
     - include_role:
-        name: prepd/prepd
-        tasks_from: ec2-host
+        name: prepd/bastion
       vars:
         # state: running
 

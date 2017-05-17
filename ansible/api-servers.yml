@@ -41,8 +41,13 @@
 #   vars_files: ['{{ credentials_file }}']
 #   tasks:
 #     - include_role:
-#         name: api-server
+#         name: prepd/docker
 #         tasks_from: image-pull
+#       vars:
+#         images:
+#           - { image: 'redis', tag: 'latest' }
+#           - { image: 'postgres', tag: 'latest' }
+#           - { image: '{{ image_name }}', tag: '{{ image_tag }}' }
 
 
 - hosts: api-servers:&pro-train

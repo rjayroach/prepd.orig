@@ -10,7 +10,7 @@ setup:
       regions: [ap-southeast-1]
       vpc_destination_variable: ip_address #  private_ip_address
       destination_variable: public_dns_name #  private_dns_name
-      boto_profile: taggo
+      boto_profile: default
     development: {}
     staging: {}
     production:

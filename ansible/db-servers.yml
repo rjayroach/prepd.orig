@@ -4,12 +4,12 @@
   tags: dump
   tasks:
     - include_role:
-        name: db-server
+        name: prepd/db-server
         tasks_from: db-dump
 
 - hosts: db-servers
   tags: restore
   tasks:
     - include_role:
-        name: db-server
+        name: prepd/db-server
         tasks_from: db-restore
