@@ -5,14 +5,14 @@
     - apt:
         name: git
         state: present
-
-    - name: Inialize git repostiory
-      command: '{{ item }}'
-      args:
-        chdir: '{{ ops_dir }}'
-      with_items:
-        - rm -rf .git
-        - git init
+#
+# - name: Inialize git repostiory
+# command: '{{ item }}'
+#       args:
+#         chdir: '{{ ops_dir }}'
+#       with_items:
+#         - rm -rf .git
+#         - git init
 
     - name: Clone dependent roles
       command: 'git submodule add {{ item.repo }} {{ item.location }}'
@@ -23,11 +23,11 @@
         - { repo: 'git@github.com:rjayroach/prepd-roles.git', location: 'ansible/community-roles/prepd' }
         - { repo: 'git@github.com:rjayroach/terraplate.git', location: 'ansible/community-roles/terraplate' }
         - { repo: 'git@github.com:rjayroach/terraplate-components.git', location: 'ansible/community-roles/terraplate-components' }
-
-    - name: Add files and make first commit
-      command: '{{ item }}'
-      args:
-        chdir: '{{ ops_dir }}'
-      with_items:
-        - git add .
-        - git commit -m 'first commit from prepd'
+#
+#     - name: Add files and make first commit
+#       command: '{{ item }}'
+#       args:
+#         chdir: '{{ ops_dir }}'
+#       with_items:
+#         - git add .
+#         - git commit -m 'first commit from prepd'

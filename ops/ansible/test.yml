@@ -3,25 +3,22 @@
 - hosts: provisioner
   tags: config
   tasks:
-    - debug: var=playbook_dir
-    - debug: var=ops_dir
     - debug: var=infrastructure_env
 
-    - debug: var=project_name
+    - debug: var=prepd_dir
 
-    - debug: var=data_dir
+    - debug: var=project_name
+    - debug: var=project_dir
+
     - debug: var=credentials_dir
+    - debug: var=data_dir
+    - debug: var=dev_dir
+    - debug: var=ops_dir
 
     - debug: var=cert_dir
-
+    - debug: var=credentials_file
     - debug: var=ssh_dir
 
     - debug: var=ansible_dir
     - debug: var=kubernetes_dir
     - debug: var=terraform_dir
-
-    # - include_role:
-    #     name:  prepd/prepd
-    #     tasks_from: test
-    #   vars:
-    #       test: success!
