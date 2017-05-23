@@ -5,6 +5,7 @@
 # Variables for provisioner setup
 setup:
   roles: [app-server, api-server, dev-server, db-server]
+  environments: [development, staging, production]
   ec2_ini:
     default:
       regions: [ap-southeast-1]
