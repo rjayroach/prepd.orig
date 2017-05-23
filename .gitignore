@@ -1,7 +1,9 @@
 # http://stackoverflow.com/questions/5533050/gitignore-exclude-folder-but-include-specific-subfolder/
 # .vagrant/
-# .DS_Store
-# /data/*
-# !data/.keep
-# /credentials/*
-# !credentials/README.md
+.DS_Store
+/credentials/*
+!credentials/README.md
+/data/*
+!data/.keep
+/dev/*
+!dev/.keep
