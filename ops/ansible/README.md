@@ -15,6 +15,7 @@ After cloning prepd into a specific project directory then clone the submodules
 cd project_name/ops/ansible
 git remote rename origin upstream
 git remote add origin git_remote_url
+git branch -u origin/master
 ./init.yml
 ```
 

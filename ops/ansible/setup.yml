@@ -1,14 +1,6 @@
 #!/usr/bin/env ansible-playbook
 ---
-# Setup location for data and credentials
+# Create credentials and data directories and setup inventories and roles
 - hosts: provisioner
   roles:
-    - { role: prepd/setup, tags: always }
-
-- hosts: provisioner
-  tasks:
-    - include_role:
-        name: prepd/setup
-        tasks_from: inventory
-      tags: inventory
-
+    - prepd/setup
