@@ -1,0 +1,47 @@
+# group_vars/all/provisioner.yml
+# export TF_VAR_s3_template_file_credentials_path=/home/vagrant/webapp
+---
+# TODO: add these under package namespace
+mfwa_global:
+  aws_region: ap-southeast-1
+  domain: example.com
+
+mfwa_package:
+  directory: example
+  remote_state:
+    bucket: com-example-terraform-state
+    region: ap-southeast-1
+  provider:
+    credential: default
+    region: ap-southeast-1
+
+# Applies to all instances of this specific Component
+# mfwa_component_vpc_public_only:
+#   provider:
+#     credential: gov-cloud
+#     region: us-gov-west-1
+
+
+### Subdomain
+mfwa_instance_dns_domain:
+  remote_states:
+    domain: 'global/subdomains/{{ infrastructure_env }}'
+
+mfwa_module_support_subdomain_route53_subdomain:
+  tfvars:
+    name: 'rl.{{ infrastructure_env }}.{{ mfwa_global.domain }}'
+    name_h: 'rl-{{ infrastructure_env }}.{{ mfwa_global.domain }}'
+
+mfwa_instance_vpc_security_groups:
+  remote_states:
+    vpc: vpc/vpc
+
+mfwa_instance_rds_database:
+  remote_states:
+    vpc: vpc/vpc
+    sg: vpc/security-groups
+
+mfwa_instance_ec2_instance:
+  remote_states:
+    vpc: vpc/vpc
+    sg: vpc/security-groups

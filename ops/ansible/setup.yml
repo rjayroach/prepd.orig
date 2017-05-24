@@ -4,3 +4,8 @@
 - hosts: provisioner
   roles:
     - prepd/setup
+
+- hosts: provisioner
+  tags: credentials
+  roles:
+    - prepd/credentials

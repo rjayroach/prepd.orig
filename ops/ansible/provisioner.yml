@@ -1,9 +1,7 @@
 #!/usr/bin/env ansible-playbook
-# export TF_VAR_ec2_key_pair_public_key_path=/home/vagrant/terraplate/playbooks/credentials/keys
-# ./provisioner.yml -t pro-train --skip-tags=debug,module,component,resource
+# ./provisioner.yml -t tag_name --skip-tags=debug,module,component,resource
 ---
 - hosts: provisioner
-  gather_facts: no
   pre_tasks:
     # NOTE: This is only intended to be used by a bastion host; For mapping internal instances create a new task
     # Creating the key and updating ssh config are really two separate tasks
@@ -22,60 +20,109 @@
         tasks_from: get-current-ip
       tags: get-ip
 
-- hosts: provisioner
-  gather_facts: no
-  roles:
-    - { role: terraplate/package, tags: [always], name: 'mfwa' }
-    # Generate Terraform templates for subdomains (rl.staging.re.com, rl.development.re.com and rl.re.com)
-    - { role: terraplate-components/aws/subdomain, tags: [dns], ns: 'dns', name: 'domain' }
 
 - hosts: provisioner
   gather_facts: no
-  tags: pro-train
-  vars:
-    - ns: pro-train
-  pre_tasks:
+  roles:
+    - { role: terraplate/package, tags: always, name: 'mfwa' }
+  tasks:
     - include_role:
-        name:  provisioner
-        tasks_from: vpc
-  roles:
-    # - { role: terraplate-components/aws/vpn, tags: [pro-train], name: 'vpn' }
+        name: terraplate-components/aws/vpc/vpc
+      vars:
+        ns: vpc
+        name: vpc
+        cidr_block: 172.16.0.0/20
+        tags:
+          Name: example 
+        nat_gateway:
+          subnet: vpc-public-1
+        subnets:
+          - { meta_name: public-1, availability_zone: ap-southeast-1a, cidr_block: 172.16.0.0/24, tags: { Name: 'public-1' }, rtb: vpc-route-table.route_table_id }
+          - { meta_name: public-2, availability_zone: ap-southeast-1b, cidr_block: 172.16.2.0/24, tags: { Name: 'public-2' }, rtb: vpc-route-table.route_table_id }
+          - { meta_name: private-1, availability_zone: ap-southeast-1a, cidr_block: 172.16.1.0/24, tags: { Name: 'private-1' }, rtb: vpc-vpc.route_table_id, map_public_ip_on_launch: 'false' }
+          - { meta_name: private-2, availability_zone: ap-southeast-1b, cidr_block: 172.16.3.0/24, tags: { Name: 'private-2' }, rtb: vpc-vpc.route_table_id, map_public_ip_on_launch: 'false' }
+      tags: vpc
 
-- hosts: provisioner
-  gather_facts: no
-  tags: processor, processor-alb
-  vars:
-    - ns: processor
-  pre_tasks:
     - include_role:
-        name:  provisioner
-        tasks_from: app
-  roles:
-    # - { role: terraplate-components/aws/rds-and-subnet, tags: [processor], name: 'database' }
+        name: terraplate-components/aws/vpc/security-groups
+      vars:
+        ns: vpc
+        name: security-groups
+        security_groups:
+          - { meta_name: app-server, description: app-server-security-group, name: app-server, tags: { Name: 'app-server' } }
+          - { meta_name: elb, description: elb-security-group, name: elb, tags: { Name: 'elb' } }
+          - { meta_name: mysql, description: mysql-security-group, name: mysql, tags: { Name: 'mysql' } }
+        cidr_rules:
+          - { port: 3000, type: ingress, group: app-server }
+          - { port: 80, type: ingress, group: app-server }
+          - { port: 22, type: ingress, group: app-server }
+          - { port: 0, protocol: -1, type: egress, group: app-server }
+          - { port: 443, type: ingress, group: elb }
+        sg_rules:
+          - { port: 3000, type: egress, group: elb, source_group: app-server }
+          - { port: 80, type: egress, group: elb, source_group: app-server }
+          - { port: 3306, type: ingress, group: mysql, source_group: app-server }
+      tags: sgs
 
-    # - hosts: provisioner
-    #   tags: training
-    #   vars:
-    #     - ns: training
-    #   pre_tasks:
-    #     - include_role:
-    #         name:  provisioner
-    #         tasks_from: app
-    # 
-    # - hosts: provisioner
-    #   tags: sales-vpc
-    #   vars:
-    #     ns: sales
-    #   pre_tasks:
-    #     - include_role:
-    #         name:  provisioner
-    #         tasks_from: vpc
-    # 
-    # - hosts: provisioner
-    #   tags: sales
-    #   vars:
-    #     ns: sales
-    #   tasks:
-    #     - include_role:
-    #         name:  provisioner
-    #         tasks_from: app
+    - name: Create ssh key-pair
+      include_role:
+        name: prepd/ssh
+      vars:
+        private_key_path: '{{ ssh_dir }}/ansible'
+      tags: ec2
+
+    - include_role:
+        name: terraplate-components/aws/ec2/instance
+      vars:
+        ns: ec2
+        name: instance
+        associate_public_ip_address: 'true'
+        availability_zone: ap-southeast-1a
+        key_name: ansible
+        region: ap-southeast-1
+        tags:
+          Name: server-1
+          Environment: '{{ infrastructure_env }}'
+          Role-legacy-app-server: 'yes'
+        vpc_security_group_ids:
+          - { provider: sg, name: vpc_app_server_security_group_id }
+        subnet_id_name: vpc_public_1_subnet_id
+        # key-pair
+        create_key_pair: yes
+        public_key_name: ansible.pub
+        public_key_path: '{{ ssh_dir }}'
+        map_eip: yes
+      tags: ec2
+
+    - include_role:
+        name: terraplate-components/aws/rds/instance-and-subnet
+      vars:
+        ns: rds
+        name: database
+        # instance vars
+        availability_zone: ap-southeast-1a
+        engine: mysql
+        engine_version: 5.7
+        parameter_group_name: default.mysql5.7
+        port: 3306
+        identifier: '{{ application_name }}-processor-{{ infrastructure_env }}'
+        instance_class: db.t2.micro
+        instance_name: '{{ application_name }}_processor_{{ infrastructure_env }}'
+        password: abcd1234
+        # storage_encrypted: 'true'
+        username: override
+        tags:
+          Name: mysql
+          Role-database: 'yes'
+          Environment: '{{ infrastructure_env }}'
+        # db-subnet vars
+        subnet_ids:
+          - { provider: vpc, name: vpc_public_1_subnet_id }
+          - { provider: vpc, name: vpc_public_2_subnet_id }
+        vpc_security_group_ids:
+          - { provider: sg, name: vpc_mysql_security_group_id }
+        # file vars
+        file_key: 'tf_{{ application_name }}_rds'
+        file_name: '{{ infrastructure_env }}/tf-rds-{{ application_name }}-processor-database.yml'
+        file_path: '{{ playbook_dir }}/group_vars'
+      tags: rds
