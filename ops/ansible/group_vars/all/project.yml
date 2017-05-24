@@ -1,55 +1,92 @@
+# group_vars/all/project.yml
+# export TF_VAR_s3_template_file_credentials_path=/home/vagrant/webapp
 ---
-# Project dependenices variables (dev-servers.yml -t config)
-config:
-  machine:
-    time_zone: 'Asia/Singapore'
-    shell: zsh
-    aliases_file: '{{ ansible_env.HOME }}/.zsh.after/aliases.zsh'
-    tools:
-      - { name: yadr }
-      - { name: awscli }
-      - { name: tmuxinator }
-  databases:
-    - { name: mysql, version: latest, mysql_user_name: '{{ database_user }}', mysql_user_password: '{{ database_password_vault }}' }
-    # - { name: postgresql, version: latest }
-    # - { name: redis, version: latest }
-  languages:
-    - { name: ruby, version: 2.3.0 }
-    - { name: nodejs, version: 6.9.0 }
-  ci:
-    xcircleci:
-      - { provider: 'github', account: 'maxcole', repo: 'tfg' }
-      - { provider: 'github', account: 'maxcole', repo: 'fan_club' }
+application_name: 'tfg'
+
+# Variables for setup.yml
+setup:
+  environments: [development, staging, production]
+  roles: [dev-server, app-server, db-server]
+  ec2_ini:
+    default:
+      regions: [ap-southeast-1]
+      vpc_destination_variable: ip_address #  private_ip_address
+      destination_variable: public_dns_name #  private_dns_name
+      boto_profile: taggo
+    staging: {}
+    production: {}
 
 
-# Variables for deploymet of the project (dev-servers.yml -t deploy)
-git_account: 'git@github.com:maxcole'
-agit_account: 'git@github.com:rjayroach'
-deploy:
-  databases:
-    mysql:
-      - tfg_development
-      - tfg_test
-  # env_apps:
-  #   - { dir: '{{ dev_dir }}/api', envs: '{{ api_server }}' }
-  #   - { dir: '{{ dev_dir }}/app', envs: '{{ web_app }}' }
-  #   #- { dir: '{{ dev_dir }}/app-chat', envs: '{{ app_chat_envs }}' }
-  repos:
-    git:
-      - { account: '{{ git_account }}', name: 'tfg', dir: '{{ dev_dir }}' }
-      - { account: '{{ git_account }}', name: 'fan_club', dir: '{{ dev_dir }}' }
-      - { account: '{{ agit_account }}', name: 'mcp_common', dir: '{{ dev_dir }}' }
-      - { account: '{{ agit_account }}', name: 'dry-auth', dir: '{{ dev_dir }}' }
-      - { account: '{{ agit_account }}', name: 'cache-party', dir: '{{ dev_dir }}' }
-  apps:
-    rails:
-      - { name: 'tfg', dir: '{{ dev_dir }}', bundle: no, migrate: no }
-      - { name: 'fan_club', dir: '{{ dev_dir }}', bundle: no, migrate: no, local: yes }
-      - { name: 'mcp_common', dir: '{{ dev_dir }}', bundle: no, migrate: no, local: yes }
-      - { name: 'dry-auth', dir: '{{ dev_dir }}', bundle: no, migrate: no, local: yes }
-      - { name: 'cache-party', dir: '{{ dev_dir }}', bundle: no, migrate: no, local: yes }
-    ember:
-      # - { name: 'app-web', dir: '{{ dev_dir }}' }
-  tools:
-    tmuxinator:
+git_account: git@github.com:maxcole
+agit_account: git@github.com:rjayroach
+
+machine:
+  time_zone: 'Asia/Singapore'
+  shell: zsh
+  aliases_file: '{{ ansible_env.HOME }}/.zsh.after/aliases.zsh'
+
+
+### tfg
+tfg_defaults:
+  DATABASE_NAME: 'tfg_{{ infrastructure_env }}'
+  DATABASE_PASSWORD: '{{ tfg_vault_DATABASE_PASSWORD }}'
+
+tfg_props: '{{ tfg_defaults | combine(tfg_vars) }}'
+
+
+# application.prepd_role.role_data
+# role_data is in whatever format the role will process it in
+tfg:
+  circleci:
+    - { provider: 'github', account: 'maxcole', repo: 'tfg' }
+    - { provider: 'github', account: 'maxcole', repo: 'fan_club' }
+  env:
+    files:
+      - { path: '{{ dev_dir }}/tfg/.env', envs: '{{ tfg_props }}' }
+  git:
+    dir: '{{ dev_dir }}'
+    repos:
+      - { account: '{{ git_account }}', name: 'tfg' }
+      - { account: '{{ git_account }}', name: 'fan_club' }
+      - { account: '{{ agit_account }}', name: 'mcp_common' }
+      - { account: '{{ agit_account }}', name: 'dry-auth' }
+      - { account: '{{ agit_account }}', name: 'cache-party' }
+  mysql:
+    users:
+      - { name: '{{ tfg_props.DATABASE_USER }}', password: '{{ tfg_props.DATABASE_PASSWORD }}' }
+    databases:
+      - { name: '{{ tfg_props.DATABASE_NAME }}' }
+  rails:
+    dir: '{{ dev_dir }}'
+    apps:
+      - { name: 'tfg' }
+      - { name: 'fan_club', local: yes }
+      - { name: 'mcp_common', local: yes }
+      - { name: 'dry-auth', local: yes }
+      - { name: 'cache-party', local: yes }
+  ruby:
+    version: 2.3.0
+  tmuxinator:
+    files:
       - { name: '{{ project_name }}.yml', src: '{{ dev_dir }}/tfg/.tmuxinator.yml' }
+
+
+# inventory_role.tag.application[roles]
+# e.g. Role_dev_server_yes
+dev_server:
+  config:
+    machine: [awscli, yadr]
+    tfg: [git, mysql, rails, ruby, tmuxinator]
+  config_local:
+    tfg: [circleci]
+  deploy:
+    tfg: [env]
+    # tfg: [env, mysql, tmuxinator]
+  deploy_local: {}
+
+# inventory_role.tag.application_name[prepd_roles]
+# the deploy playbook will be run in each role listed
+app_server:
+  config:
+  deploy:
+    tfg: [rails/capistrano]
