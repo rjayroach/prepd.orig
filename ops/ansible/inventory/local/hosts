@@ -7,6 +7,9 @@ provisioner ansible_host=localhost ansible_connection=local
 infrastructure_env=local
 
 ### Roles
+[tag_Role_dev_server_yes]
+node0.local
+
 [tag_Role_master]
 node0.local
 

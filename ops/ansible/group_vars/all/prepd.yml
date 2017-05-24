@@ -10,7 +10,8 @@ project_dir: '{{ playbook_dir.split("/")[0:-2] | join("/") }}'
 
 credentials_dir: '{{ project_dir }}/credentials'
 data_dir: '{{ project_dir }}/data'
-dev_dir: '{{ project_dir }}/dev'
+# dev_dir: '{{ project_dir }}/dev'
+dev_dir: '{{ ansible_env.HOME }}/{{ project_name }}/dev'
 ops_dir: '{{ project_dir }}/ops'
 
 cert_dir: '{{ data_dir }}/cert'
