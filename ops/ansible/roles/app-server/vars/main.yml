@@ -1,9 +1,0 @@
----
-envs: 
-  API_HOST: 'https://{{ application_flavor }}-api-{{ infrastructure_env }}.{{ domain }}:{{ api_server_port }}'
-  DIRECTORY: '{{ root_directory }}/{{ application_flavor }}'
-  HOST: '{{ remote_host }}'
-  PORT: '{{ tunnel_port }}'
-  PRIVATE_KEY_FILE: '{{ private_key_file }}'
-  SSH_HOST: "{{ ssh_host | default('localhost') }}"
-  USERNAME: '{{ username }}'

@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+cp templates/ansible/provisioner.yml ops/ansible
+cp templates/ansible/group_vars/all/provisioner.yml ops/ansible/group_vars/all
+cp templates/ansible/group_vars/all/project.yml ops/ansible/group_vars/all
+cd ops/ansbile
+init.yml

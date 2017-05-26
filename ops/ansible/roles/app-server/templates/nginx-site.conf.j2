@@ -1,9 +1,0 @@
-server {
-  listen 80;
-  root {{ root_directory }}/{{ item }};
-  server_name {{ item }}-{{ infrastructure_env }}.{{ domain }};
-  index index.html;
-  location / { 
-    try_files $uri $uri/ /index.html;
-  }
-}

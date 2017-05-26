@@ -1,9 +1,0 @@
-# api-server/config
----
-- include_role:
-    name: prepd/common
-  vars:
-    machine_env: '{{ config.machine_env }}'
-
-- include_role:
-    name: prepd/docker
